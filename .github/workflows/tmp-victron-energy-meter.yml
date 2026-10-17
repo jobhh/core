@@ -47,7 +47,11 @@ jobs:
       - name: Commit the result
         if: always()
         run: |
+          set +e
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add -A -- . ':!.venv'
-          git commit -q -m "Integration report" && git push
+          git status --short | head -40 | while read -r l; do echo "::notice::status $l"; done
+          git add ci-report.txt homeassistant/generated homeassistant/components/victron_energy_meter \
+            tests/components/victron_energy_meter requirements_all.txt requirements_test_all.txt CODEOWNERS
+          git commit -q -m "Integration report" 2>&1 | while read -r l; do echo "::warning::commit $l"; done
+          git push 2>&1 | while read -r l; do echo "::warning::push $l"; done
