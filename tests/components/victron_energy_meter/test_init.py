@@ -187,7 +187,6 @@ async def test_phase_configuration_change_reloads(
     async_fire_time_changed(hass)
     await hass.async_block_till_done(wait_background_tasks=True)
 
-    assert sorted({hex(e.address) for e in mock_unit.read_events}) == []  # debug
     assert init_integration.state is ConfigEntryState.LOADED
     assert init_integration.runtime_data.meter.phases == (1,)
     assert hass.states.get("sensor.vm_3p75ct_voltage_l1").state == "230.12"

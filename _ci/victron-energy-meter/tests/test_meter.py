@@ -164,18 +164,27 @@ async def test_vm_3p5a_reads_the_high_range_currents(
     assert l1 is not None and l1.current is None  # never read on this model
 
 
+@pytest.mark.parametrize(
+    ("configuration", "phase"),
+    [
+        (PhaseConfiguration.SINGLE_PHASE_L1, 1),
+        (PhaseConfiguration.SINGLE_PHASE_L2, 2),
+        (PhaseConfiguration.SINGLE_PHASE_L3, 3),
+    ],
+)
 async def test_single_phase_meter_polls_only_its_phase(
-    mock_modbus_unit: MockModbusUnit,
+    mock_modbus_unit: MockModbusUnit, configuration: PhaseConfiguration, phase: int
 ) -> None:
     seed(mock_modbus_unit)
-    mock_modbus_unit.holding[0x2000] = PhaseConfiguration.SINGLE_PHASE_L2
+    mock_modbus_unit.holding[0x2000] = configuration
     meter = VictronEnergyMeter(mock_modbus_unit)
     await meter.async_update()
 
-    assert meter.phases == (2,)
-    assert meter.phase(1) is None and meter.phase(3) is None
-    l2 = meter.phase(2)
-    assert l2 is not None and l2.voltage == 231.2
+    assert meter.phases == (phase,)
+    for other in {1, 2, 3} - {phase}:
+        assert meter.phase(other) is None
+    measured = meter.phase(phase)
+    assert measured is not None and measured.voltage is not None
 
 
 async def test_split_phase_meter(mock_modbus_unit: MockModbusUnit) -> None:

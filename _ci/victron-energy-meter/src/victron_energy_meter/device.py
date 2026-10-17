@@ -103,9 +103,10 @@ class VictronEnergyMeter(Device):
             )
 
         await self.configuration.async_update()
-        phase_configuration = (
-            self.configuration.phase_configuration or PhaseConfiguration.THREE_PHASE
-        )
+        # Single phase on L1 is 0, so test for None rather than truthiness.
+        phase_configuration = self.configuration.phase_configuration
+        if phase_configuration is None:
+            phase_configuration = PhaseConfiguration.THREE_PHASE
         unit = self.modbus_unit
         has_detail = firmware.at_least(1, 7)
         has_v109 = firmware.at_least(1, 9)
