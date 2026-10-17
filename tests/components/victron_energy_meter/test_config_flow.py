@@ -15,13 +15,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from . import (
-    EM540_SERIAL,
-    GATEWAY_INPUT,
-    NETWORK_INPUT,
-    SERIAL_INPUT,
-    VM_SERIAL,
-)
+from . import EM540_SERIAL, GATEWAY_INPUT, NETWORK_INPUT, SERIAL_INPUT, VM_SERIAL
 
 from tests.common import MockConfigEntry
 
@@ -41,9 +35,30 @@ ZEROCONF_DISCOVERY = ZeroconfServiceInfo(
 @pytest.mark.parametrize(
     ("meter_kind", "link", "user_input", "serial", "title"),
     [
-        pytest.param("em540", LinkType.SERIAL, SERIAL_INPUT, EM540_SERIAL, "EM540 PFC", id="serial"),
-        pytest.param("em540", LinkType.GATEWAY, GATEWAY_INPUT, EM540_SERIAL, "EM540 PFC", id="gateway"),
-        pytest.param("vm_3p75ct", LinkType.NETWORK, NETWORK_INPUT, VM_SERIAL, "VM-3P75CT", id="network"),
+        pytest.param(
+            "em540",
+            LinkType.SERIAL,
+            SERIAL_INPUT,
+            EM540_SERIAL,
+            "EM540 PFC",
+            id="serial",
+        ),
+        pytest.param(
+            "em540",
+            LinkType.GATEWAY,
+            GATEWAY_INPUT,
+            EM540_SERIAL,
+            "EM540 PFC",
+            id="gateway",
+        ),
+        pytest.param(
+            "vm_3p75ct",
+            LinkType.NETWORK,
+            NETWORK_INPUT,
+            VM_SERIAL,
+            "VM-3P75CT",
+            id="network",
+        ),
     ],
 )
 async def test_user_flow(
@@ -102,7 +117,9 @@ async def test_cannot_connect_then_recover(
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
-async def test_unsupported_meter(hass: HomeAssistant, mock_unit: MockModbusUnit) -> None:
+async def test_unsupported_meter(
+    hass: HomeAssistant, mock_unit: MockModbusUnit
+) -> None:
     """Test a device that answers with an unknown model code."""
     read = mock_unit.read_input_registers
 

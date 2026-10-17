@@ -15,18 +15,22 @@ from homeassistant.helpers import entity_registry as er
 
 from tests.common import MockConfigEntry, snapshot_platform
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
-
-@pytest.mark.usefixtures("entity_registry_enabled_by_default")
-@pytest.mark.parametrize("meter_kind", ["em540", "vm_3p75ct"])
-@pytest.mark.parametrize("platform", PLATFORMS)
+@pytest.mark.usefixtures("entity_registry_enabled_by_default", "mock_get_unit")
+@pytest.mark.parametrize(
+    ("meter_kind", "platform"),
+    [
+        pytest.param("em540", Platform.BINARY_SENSOR, id="em540-binary_sensor"),
+        pytest.param("em540", Platform.BUTTON, id="em540-button"),
+        pytest.param("em540", Platform.SENSOR, id="em540-sensor"),
+        pytest.param("vm_3p75ct", Platform.SENSOR, id="vm_3p75ct-sensor"),
+    ],
+)
 async def test_entities(
     hass: HomeAssistant,
     entity_registry: er.EntityRegistry,
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
-    mock_get_unit: object,
     platform: Platform,
 ) -> None:
     """Test every entity a meter serves, with every entity enabled."""

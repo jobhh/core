@@ -874,6 +874,7 @@ FLOWS = {
         "vesync",
         "vicare",
         "victron_ble",
+        "victron_energy_meter",
         "victron_gx",
         "victron_remote_monitoring",
         "vilfo",

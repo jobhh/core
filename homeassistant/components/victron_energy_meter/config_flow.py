@@ -125,6 +125,7 @@ class VictronEnergyMeterConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders,
         )
 
+    @override
     async def async_step_zeroconf(
         self, discovery_info: ZeroconfServiceInfo
     ) -> ConfigFlowResult:
@@ -195,8 +196,12 @@ class VictronEnergyMeterConfigFlow(ConfigFlow, domain=DOMAIN):
                 meter = create_meter(data, unit)
                 await meter.async_ensure_setup()
         except (ModbusError, HomeAssistantError) as err:
-            return None, {"base": "cannot_connect"}, {"error": str(err) or type(err).__name__}
-        except (CarloGavazziUnsupported, VictronUnsupported):
+            return (
+                None,
+                {"base": "cannot_connect"},
+                {"error": str(err) or type(err).__name__},
+            )
+        except CarloGavazziUnsupported, VictronUnsupported:
             return None, {"base": "unsupported_meter"}, {}
         except UnsupportedFirmwareError:
             return None, {"base": "unsupported_firmware"}, {}

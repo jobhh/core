@@ -1,5 +1,7 @@
 """Tests for the Victron Energy Meter diagnostics."""
 
+from modbus_connection import ModbusTimeoutError
+from modbus_connection.mock import MockModbusUnit
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
@@ -22,3 +24,18 @@ async def test_diagnostics(
         hass, hass_client, init_integration
     )
     assert diagnostics == snapshot
+
+
+async def test_diagnostics_when_the_meter_does_not_answer(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    init_integration: MockConfigEntry,
+    mock_unit: MockModbusUnit,
+) -> None:
+    """Test the download still works, naming the read error."""
+    mock_unit.fail_requests(ModbusTimeoutError())
+    diagnostics = await get_diagnostics_for_config_entry(
+        hass, hass_client, init_integration
+    )
+    assert diagnostics["read_error"] == "ModbusTimeoutError"
+    assert diagnostics["raw"] is None

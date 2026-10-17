@@ -4,12 +4,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from carlo_gavazzi_modbus import EM500Meter
-from modbus_connection import (
-    ModbusSerialParams,
-    ModbusTcpParams,
-    ModbusUdpParams,
-    ModbusUnit,
-)
+from modbus_connection import ModbusSerialParams, ModbusUdpParams, ModbusUnit
 from victron_energy_meter import (
     PORT as VICTRON_PORT,
     UNIT_ID as VICTRON_UNIT_ID,
@@ -25,7 +20,7 @@ type Meter = EM500Meter | VictronEnergyMeter
 
 def create_modbus_params(
     data: Mapping[str, Any],
-) -> ModbusSerialParams | ModbusTcpParams | ModbusUdpParams:
+) -> ModbusSerialParams | ModbusUdpParams:
     """Build the Modbus link parameters from config entry data."""
     match LinkType(data[CONF_TYPE]):
         case LinkType.NETWORK:
@@ -35,7 +30,13 @@ def create_modbus_params(
                 device=data[CONF_DEVICE], baudrate=data[CONF_BAUDRATE]
             )
         case LinkType.GATEWAY:
-            return ModbusTcpParams(host=data[CONF_HOST], port=data[CONF_PORT], framer="rtu")
+            # RTU frames a serial line, so a transparent gateway is a serial
+            # link over a socket. An IPv6 literal needs brackets in the URL.
+            host = data[CONF_HOST]
+            host = f"[{host}]" if ":" in host else host
+            return ModbusSerialParams(
+                device=f"socket://{host}:{data[CONF_PORT]}", framer="rtu"
+            )
 
 
 def unit_id(data: Mapping[str, Any]) -> int:
@@ -61,4 +62,6 @@ def meter_name(meter: Meter) -> str:
 
 def manufacturer(meter: Meter) -> str:
     """Who makes the meter."""
-    return "Victron Energy" if isinstance(meter, VictronEnergyMeter) else "Carlo Gavazzi"
+    return (
+        "Victron Energy" if isinstance(meter, VictronEnergyMeter) else "Carlo Gavazzi"
+    )
