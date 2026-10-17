@@ -211,7 +211,8 @@ def _energy_sources(meter: CarloGavazziMeter) -> tuple[str, str]:
         return "energy", "energy"
     best = meter.best_energy()
     totals = next(
-        name for name in ("energy_wh", "energy_precise", "energy")
+        name
+        for name in ("energy_wh", "energy_precise", "energy")
         if getattr(meter, name) is best
     )
     return totals, "energy_wh" if meter.energy_wh is not None else "energy"
@@ -226,18 +227,20 @@ def _carlo_gavazzi(meter: CarloGavazziMeter) -> list[VictronMeterSensorDescripti
     totals, detail = _energy_sources(meter)
     sensors: list[VictronMeterSensorDescription] = []
 
-    def add(
-        key: str, component: str, field: str, kind: _Kind, **kwargs: Any
-    ) -> None:
+    def add(key: str, component: str, field: str, kind: _Kind, **kwargs: Any) -> None:
         if _serves(meter, component, field):
             sensors.append(
-                _sensor(key, component, attrgetter(f"{component}.{field}"), kind, **kwargs)
+                _sensor(
+                    key, component, attrgetter(f"{component}.{field}"), kind, **kwargs
+                )
             )
 
     def add_enum(key: str, component: str, field: str, options: type[IntEnum]) -> None:
         if _serves(meter, component, field):
             sensors.append(
-                _enum_sensor(key, component, attrgetter(f"{component}.{field}"), options)
+                _enum_sensor(
+                    key, component, attrgetter(f"{component}.{field}"), options
+                )
             )
 
     add("active_power", m, "active_power", POWER)

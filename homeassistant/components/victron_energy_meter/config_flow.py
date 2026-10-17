@@ -33,13 +33,7 @@ from .const import (
     DOMAIN,
     LinkType,
 )
-from .helpers import (
-    Meter,
-    async_setup_meter,
-    create_modbus_params,
-    meter_name,
-    unit_id,
-)
+from .helpers import Meter, async_setup_meter, create_modbus_params, meter_name, unit_id
 
 UNIT_ID_SELECTOR = probatio.All(
     NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, min=1, max=247)),

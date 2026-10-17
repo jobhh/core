@@ -33,12 +33,12 @@
 Validating triggers... done in 0.08s
 Validating usb... done in 0.01s
 Validating zeroconf... done in 0.01s
-Validating config_flow... done in 0.04s
+Validating config_flow... done in 0.05s
 Validating core_files... done in 0.00s
 Validating device_classes... done in 0.00s
 Validating docker... done in 0.00s
 Validating mdi_icons... done in 0.00s
-Validating mypy_config... done in 0.01s
+Validating mypy_config... done in 0.02s
 Validating metadata... done in 0.00s
 Validating sensor... done in 0.00s
 
@@ -53,37 +53,37 @@ Generating translations for energy
 Generating translations for dyson_infrared
 🌎 Generated translation files for all integrations
 == ruff format
-16 files left unchanged
+1 file reformatted, 15 files left unchanged
 == ruff check
-All checks passed!
+Found 1 error (1 fixed, 0 remaining).
 == pytest (snapshot update)
 --------------------------- snapshot report summary ----------------------------
-188 snapshots passed.
-37 passed in 1.96s
+188 snapshots passed. 105 snapshots generated.
+44 passed in 2.94s
 == pytest
-.....................................                                    [100%]
+............................................                             [100%]
 ================================ tests coverage ================================
 _______________ coverage: platform linux, python 3.14.5-final-0 ________________
 
 Name                                                             Stmts   Miss  Cover   Missing
 ----------------------------------------------------------------------------------------------
-homeassistant/components/victron_energy_meter/__init__.py           42      0   100%
-homeassistant/components/victron_energy_meter/binary_sensor.py      28      0   100%
-homeassistant/components/victron_energy_meter/button.py             33      0   100%
-homeassistant/components/victron_energy_meter/config_flow.py        83      0   100%
+homeassistant/components/victron_energy_meter/__init__.py           41      0   100%
+homeassistant/components/victron_energy_meter/binary_sensor.py      29      0   100%
+homeassistant/components/victron_energy_meter/button.py             36      0   100%
+homeassistant/components/victron_energy_meter/config_flow.py        82      0   100%
 homeassistant/components/victron_energy_meter/const.py              17      0   100%
 homeassistant/components/victron_energy_meter/coordinator.py        41      0   100%
 homeassistant/components/victron_energy_meter/diagnostics.py        25      0   100%
 homeassistant/components/victron_energy_meter/entity.py             24      0   100%
-homeassistant/components/victron_energy_meter/helpers.py            32      0   100%
-homeassistant/components/victron_energy_meter/sensor.py            123      0   100%
+homeassistant/components/victron_energy_meter/helpers.py            35      0   100%
+homeassistant/components/victron_energy_meter/sensor.py            171      0   100%
 ----------------------------------------------------------------------------------------------
-TOTAL                                                              448      0   100%
+TOTAL                                                              501      0   100%
 --------------------------- snapshot report summary ----------------------------
-188 snapshots passed.
-37 passed in 1.90s
+293 snapshots passed.
+44 passed in 2.83s
 == hassfest validate
- done in 1.20s
+ done in 1.34s
 
 Integrations: 1527
 Invalid integrations: 1
