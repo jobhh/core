@@ -23,14 +23,16 @@ jobs:
           done > /tmp/extra.txt
           uv pip install -e . -r requirements_test.txt -r /tmp/extra.txt \
             "git+https://github.com/jobhh/carlo-gavazzi-modbus" \
-            ./_ci/victron-energy-meter > /tmp/install.txt 2>&1 || cat /tmp/install.txt
+            ./_ci/victron-energy-meter > /tmp/install.txt 2>&1 || true
       - name: Report
         run: |
+          set +e +o pipefail
           source .venv/bin/activate
           R=ci-report.txt
           I=homeassistant/components/victron_energy_meter
           T=tests/components/victron_energy_meter
           {
+            echo "== install"; tail -30 /tmp/install.txt
             echo "== hassfest generate"; python -m script.hassfest --action generate 2>&1 | tail -40
             echo "== gen_requirements_all"; python -m script.gen_requirements_all 2>&1 | tail -20
             echo "== translations"; python -m script.translations develop --integration victron_energy_meter 2>&1 | tail -20
@@ -43,6 +45,7 @@ jobs:
             echo "== pylint"; pylint $I 2>&1 | tail -60
           } > $R
       - name: Commit the result
+        if: always()
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
