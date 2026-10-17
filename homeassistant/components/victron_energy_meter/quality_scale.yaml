@@ -1,0 +1,86 @@
+rules:
+  # Bronze
+  action-setup:
+    status: exempt
+    comment: This integration does not provide any actions.
+  appropriate-polling: done
+  brands: todo
+  common-modules: done
+  config-flow-test-coverage: done
+  config-flow: done
+  dependency-transparency: todo
+  docs-actions:
+    status: exempt
+    comment: This integration does not provide any actions.
+  docs-conditions:
+    status: exempt
+    comment: This integration does not provide any conditions.
+  docs-high-level-description: todo
+  docs-installation-instructions: todo
+  docs-removal-instructions: todo
+  docs-triggers:
+    status: exempt
+    comment: This integration does not provide any triggers.
+  entity-event-setup:
+    status: exempt
+    comment: Entities rely on the coordinator and subscribe to nothing else.
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure: done
+  test-before-setup: done
+  unique-config-entry: done
+
+  # Silver
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters:
+    status: exempt
+    comment: This integration does not provide an options flow.
+  docs-installation-parameters: todo
+  entity-unavailable: done
+  integration-owner: done
+  log-when-unavailable: done
+  parallel-updates: done
+  reauthentication-flow:
+    status: exempt
+    comment: A local Modbus link has no authentication that can expire.
+  test-coverage: todo
+
+  # Gold
+  devices: done
+  diagnostics: done
+  discovery-update-info: done
+  discovery:
+    status: done
+    comment: Victron's own meters announce themselves over mDNS. Carlo Gavazzi meters on RS485 cannot be discovered.
+  docs-data-update: todo
+  docs-examples: todo
+  docs-known-limitations: todo
+  docs-supported-devices: todo
+  docs-supported-functions: todo
+  docs-troubleshooting: todo
+  docs-use-cases: todo
+  dynamic-devices:
+    status: exempt
+    comment: Each config entry is one meter, with no sub-devices.
+  entity-category: done
+  entity-device-class: done
+  entity-disabled-by-default: done
+  entity-translations: done
+  exception-translations: done
+  icon-translations: todo
+  reconfiguration-flow: done
+  repair-issues:
+    status: exempt
+    comment: This integration has no user-actionable issues to repair.
+  stale-devices:
+    status: exempt
+    comment: Each config entry is one meter, with no sub-devices.
+
+  # Platinum
+  async-dependency: done
+  inject-websession:
+    status: exempt
+    comment: This integration communicates over Modbus, not HTTP.
+  strict-typing: todo

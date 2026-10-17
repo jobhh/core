@@ -1,0 +1,19 @@
+{
+  "domain": "victron_energy_meter",
+  "name": "Victron Energy Meter",
+  "codeowners": ["@jobhh"],
+  "config_flow": true,
+  "dependencies": ["modbus", "usb"],
+  "documentation": "https://www.home-assistant.io/integrations/victron_energy_meter",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "loggers": [
+    "carlo_gavazzi_modbus",
+    "modbus_connection",
+    "tmodbus",
+    "victron_energy_meter"
+  ],
+  "quality_scale": "bronze",
+  "requirements": ["carlo-gavazzi-modbus==0.1.0", "victron-energy-meter==0.1.0"],
+  "zeroconf": ["_victron-energy-meter._udp.local."]
+}
