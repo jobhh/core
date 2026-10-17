@@ -617,7 +617,7 @@ class VictronMeterSensor(VictronMeterEntity, SensorEntity):
         value = self.entity_description.value_fn(self._meter)
         if isinstance(value, IntEnum):
             return value.name.lower()
-        return value  # type: ignore[no-any-return]
+        return value
 
 
 class VictronMeterTotalSensor(VictronMeterSensor, RestoreSensor):

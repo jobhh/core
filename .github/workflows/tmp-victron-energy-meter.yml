@@ -18,10 +18,10 @@ jobs:
         run: |
           uv python install "$(cat .python-version)"
           uv venv --python "$(cat .python-version)"
-          for d in http diagnostics websocket_api zeroconf usb modbus; do
+          for d in http diagnostics websocket_api zeroconf usb modbus mqtt infrared; do
             jq -r '.requirements[]?' "homeassistant/components/$d/manifest.json"
           done > /tmp/extra.txt
-          uv pip install -e . -r requirements_test.txt -r /tmp/extra.txt \
+          uv pip install -e . -r requirements.txt -r requirements_test.txt -r /tmp/extra.txt \
             "git+https://github.com/jobhh/carlo-gavazzi-modbus" \
             ./_ci/victron-energy-meter > /tmp/install.txt 2>&1 || true
       - name: Report
