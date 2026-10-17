@@ -33,12 +33,12 @@
 Validating triggers... done in 0.08s
 Validating usb... done in 0.01s
 Validating zeroconf... done in 0.01s
-Validating config_flow... done in 0.05s
+Validating config_flow... done in 0.04s
 Validating core_files... done in 0.00s
 Validating device_classes... done in 0.00s
 Validating docker... done in 0.00s
 Validating mdi_icons... done in 0.00s
-Validating mypy_config... done in 0.02s
+Validating mypy_config... done in 0.01s
 Validating metadata... done in 0.00s
 Validating sensor... done in 0.00s
 
@@ -59,90 +59,9 @@ All checks passed!
 == pytest (snapshot update)
 --------------------------- snapshot report summary ----------------------------
 188 snapshots passed.
-1 failed, 36 passed in 2.41s
+37 passed in 1.96s
 == pytest
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_current_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_active_power_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_apparent_power_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_imported_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_exported_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l2_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_power_factor_l2
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_current_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_active_power_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_apparent_power_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_imported_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_exported_l3
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l3_l1
-INFO:homeassistant.helpers.entity_registry:Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_power_factor_l3
------------------------------- Captured log setup ------------------------------
-2026-10-17 04:36:28.698 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded victron_energy_meter from homeassistant.components.victron_energy_meter
-2026-10-17 04:36:28.700 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded usb from homeassistant.components.usb
-2026-10-17 04:36:28.700 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded modbus from homeassistant.components.modbus
-2026-10-17 04:36:28.701 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded websocket_api from homeassistant.components.websocket_api
-2026-10-17 04:36:28.702 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded http from homeassistant.components.http
-2026-10-17 04:36:28.703 INFO     MainThread homeassistant.setup:setup.py:389 Setting up modbus
-2026-10-17 04:36:28.704 INFO     MainThread homeassistant.setup:setup.py:389 Setting up http
-2026-10-17 04:36:28.705 WARNING  MainThread aiohttp_fast_zlib:__init__.py:55 zlib_ng and isal are not available, falling back to zlib, performance will be degraded.
-2026-10-17 04:36:28.705 INFO     MainThread homeassistant.components.http.config:config.py:295 Using stable HTTP config
-2026-10-17 04:36:28.707 INFO     MainThread homeassistant.setup:setup.py:389 Setting up websocket_api
-2026-10-17 04:36:28.708 INFO     MainThread homeassistant.setup:setup.py:389 Setting up usb
-2026-10-17 04:36:28.709 INFO     MainThread homeassistant.setup:setup.py:389 Setting up victron_energy_meter
-2026-10-17 04:36:28.713 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded binary_sensor from homeassistant.components.binary_sensor
-2026-10-17 04:36:28.714 INFO     MainThread homeassistant.setup:setup.py:389 Setting up binary_sensor
-2026-10-17 04:36:28.714 INFO     MainThread homeassistant.components.binary_sensor:entity_platform.py:484 Setting up victron_energy_meter.binary_sensor
-2026-10-17 04:36:28.715 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded button from homeassistant.components.button
-2026-10-17 04:36:28.717 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded sensor from homeassistant.components.sensor
-2026-10-17 04:36:28.718 INFO     MainThread homeassistant.setup:setup.py:389 Setting up button
-2026-10-17 04:36:28.719 INFO     MainThread homeassistant.components.button:entity_platform.py:484 Setting up victron_energy_meter.button
-2026-10-17 04:36:28.719 INFO     MainThread homeassistant.setup:setup.py:389 Setting up sensor
-2026-10-17 04:36:28.720 INFO     MainThread homeassistant.components.sensor:entity_platform.py:484 Setting up victron_energy_meter.sensor
-2026-10-17 04:36:28.721 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_active_power
-2026-10-17 04:36:28.722 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_frequency
-2026-10-17 04:36:28.722 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_imported
-2026-10-17 04:36:28.723 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_exported
-2026-10-17 04:36:28.723 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_earth_to_neutral_voltage
-2026-10-17 04:36:28.724 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_error_code
-2026-10-17 04:36:28.724 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_neutral_current
-2026-10-17 04:36:28.724 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_power_factor
-2026-10-17 04:36:28.724 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_phase_sequence
-2026-10-17 04:36:28.725 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_phase_rotation
-2026-10-17 04:36:28.725 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l1
-2026-10-17 04:36:28.725 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_current_l1
-2026-10-17 04:36:28.726 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_active_power_l1
-2026-10-17 04:36:28.727 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_apparent_power_l1
-2026-10-17 04:36:28.727 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_imported_l1
-2026-10-17 04:36:28.727 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_exported_l1
-2026-10-17 04:36:28.727 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l1_l2
-2026-10-17 04:36:28.727 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_power_factor_l1
-2026-10-17 04:36:28.727 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l2
-2026-10-17 04:36:28.728 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_current_l2
-2026-10-17 04:36:28.729 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_active_power_l2
-2026-10-17 04:36:28.729 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_apparent_power_l2
-2026-10-17 04:36:28.729 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_imported_l2
-2026-10-17 04:36:28.729 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_exported_l2
-2026-10-17 04:36:28.730 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l2_l3
-2026-10-17 04:36:28.730 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_power_factor_l2
-2026-10-17 04:36:28.730 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l3
-2026-10-17 04:36:28.730 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_current_l3
-2026-10-17 04:36:28.731 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_active_power_l3
-2026-10-17 04:36:28.732 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_apparent_power_l3
-2026-10-17 04:36:28.732 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_imported_l3
-2026-10-17 04:36:28.732 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_energy_exported_l3
-2026-10-17 04:36:28.732 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_voltage_l3_l1
-2026-10-17 04:36:28.732 INFO     MainThread homeassistant.helpers.entity_registry:entity_registry.py:1751 Registered new sensor.victron_energy_meter entity: sensor.vm_3p75ct_power_factor_l3
------------------------------ Captured stderr call -----------------------------
-WARNING:asyncio:Executing <Task pending name='Task-760' coro=<test_phase_configuration_change_reloads() running at /home/runner/work/core/core/tests/components/victron_energy_meter/test_init.py:188> cb=[_run_until_complete_cb() at /home/runner/work/_temp/uv-python-dir/cpython-3.14.5-linux-x86_64-gnu/lib/python3.14/asyncio/base_events.py:181] created at /home/runner/work/_temp/uv-python-dir/cpython-3.14.5-linux-x86_64-gnu/lib/python3.14/asyncio/runners.py:109> took 301.000 seconds
-INFO:homeassistant.components.binary_sensor:Setting up victron_energy_meter.binary_sensor
-INFO:homeassistant.components.button:Setting up victron_energy_meter.button
-INFO:homeassistant.components.sensor:Setting up victron_energy_meter.sensor
------------------------------- Captured log call -------------------------------
-2026-10-17 04:41:29.733 WARNING  MainThread asyncio:base_events.py:2052 Executing <Task pending name='Task-760' coro=<test_phase_configuration_change_reloads() running at /home/runner/work/core/core/tests/components/victron_energy_meter/test_init.py:188> cb=[_run_until_complete_cb() at /home/runner/work/_temp/uv-python-dir/cpython-3.14.5-linux-x86_64-gnu/lib/python3.14/asyncio/base_events.py:181] created at /home/runner/work/_temp/uv-python-dir/cpython-3.14.5-linux-x86_64-gnu/lib/python3.14/asyncio/runners.py:109> took 301.000 seconds
-2026-10-17 04:41:29.733 INFO     MainThread homeassistant.components.binary_sensor:entity_platform.py:484 Setting up victron_energy_meter.binary_sensor
-2026-10-17 04:41:29.733 INFO     MainThread homeassistant.components.button:entity_platform.py:484 Setting up victron_energy_meter.button
-2026-10-17 04:41:29.733 INFO     MainThread homeassistant.components.sensor:entity_platform.py:484 Setting up victron_energy_meter.sensor
+.....................................                                    [100%]
 ================================ tests coverage ================================
 _______________ coverage: platform linux, python 3.14.5-final-0 ________________
 
@@ -162,27 +81,9 @@ homeassistant/components/victron_energy_meter/sensor.py            123      0   
 TOTAL                                                              448      0   100%
 --------------------------- snapshot report summary ----------------------------
 188 snapshots passed.
-=========================== short test summary info ============================
-FAILED tests/components/victron_energy_meter/test_init.py::test_phase_configuration_change_reloads[vm_3p75ct] - AssertionError: assert ['0x1000', '0...'0x3030', ...] == []
-  
-  Left contains 9 more items, first extra item: '0x1000'
-  
-  Full diff:
-  - []
-  + [
-  +     '0x1000',
-  +     '0x2000',
-  +     '0x3000',
-  +     '0x3010',
-  +     '0x3020',
-  +     '0x3030',
-  +     '0x3046',
-  +     '0x304e',
-  +     '0x3056',
-  + ]
-1 failed, 36 passed in 2.30s
+37 passed in 1.90s
 == hassfest validate
- done in 1.30s
+ done in 1.20s
 
 Integrations: 1527
 Invalid integrations: 1
