@@ -52,6 +52,7 @@ jobs:
           git config user.email "github-actions@users.noreply.github.com"
           git status --short | head -40 | while read -r l; do echo "::notice::status $l"; done
           git add -A -- ci-report.txt homeassistant tests requirements_all.txt \
-            requirements_test_all.txt .github/CODEOWNERS
+            requirements_test_all.txt .github/CODEOWNERS 2>&1 | while read -r l; do echo "::warning::add $l"; done
+          git diff --cached --stat | tail -5 | while read -r l; do echo "::notice::staged $l"; done
           git commit -q -m "Integration report" 2>&1 | while read -r l; do echo "::warning::commit $l"; done
           git push 2>&1 | while read -r l; do echo "::warning::push $l"; done
