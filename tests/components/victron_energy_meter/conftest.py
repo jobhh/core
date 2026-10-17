@@ -13,8 +13,8 @@ from homeassistant.core import HomeAssistant
 
 from . import (
     EM540_SERIAL,
-    SERIAL_ENTRY_DATA,
     NETWORK_ENTRY_DATA,
+    SERIAL_ENTRY_DATA,
     VM_SERIAL,
     seed_em540,
     seed_vm_3p75ct,

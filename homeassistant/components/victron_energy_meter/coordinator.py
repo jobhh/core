@@ -58,7 +58,9 @@ class VictronMeterCoordinator(DataUpdateCoordinator[UpdateReport]):
             raise UpdateFailed(
                 translation_domain=DOMAIN,
                 translation_key="no_answer",
-            ) from ExceptionGroup("every sub-system failed", list(report.failed.values()))
+            ) from ExceptionGroup(
+                "every sub-system failed", list(report.failed.values())
+            )
         return report
 
 

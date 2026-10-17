@@ -33,7 +33,9 @@ class VictronMeterEntity(CoordinatorEntity[VictronMeterCoordinator]):
     ) -> None:
         """Initialize the entity."""
         coordinator = (
-            runtime_data.settings if description.from_settings else runtime_data.readings
+            runtime_data.settings
+            if description.from_settings
+            else runtime_data.readings
         )
         super().__init__(coordinator)
         self.entity_description = description

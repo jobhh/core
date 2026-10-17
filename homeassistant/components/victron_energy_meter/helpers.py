@@ -35,7 +35,9 @@ def create_modbus_params(
                 device=data[CONF_DEVICE], baudrate=data[CONF_BAUDRATE]
             )
         case LinkType.GATEWAY:
-            return ModbusTcpParams(host=data[CONF_HOST], port=data[CONF_PORT], framer="rtu")
+            return ModbusTcpParams(
+                host=data[CONF_HOST], port=data[CONF_PORT], framer="rtu"
+            )
 
 
 def unit_id(data: Mapping[str, Any]) -> int:
@@ -61,4 +63,6 @@ def meter_name(meter: Meter) -> str:
 
 def manufacturer(meter: Meter) -> str:
     """Who makes the meter."""
-    return "Victron Energy" if isinstance(meter, VictronEnergyMeter) else "Carlo Gavazzi"
+    return (
+        "Victron Energy" if isinstance(meter, VictronEnergyMeter) else "Carlo Gavazzi"
+    )

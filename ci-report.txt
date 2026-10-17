@@ -1,0 +1,127 @@
+== install
+ + types-atomicwrites==1.4.5.1
+ + types-chardet==0.1.5
+ + types-croniter==6.2.4.20260711
+ + types-decorator==5.2.0.20260712
+ + types-pexpect==4.9.0.20260518
+ + types-protobuf==7.35.1.20260906
+ + types-psutil==7.2.2.20260906
+ + types-pyserial==3.5.0.20260712
+ + types-python-dateutil==2.9.0.20260807
+ + types-python-slugify==8.0.2.20240310
+ + types-pytz==2026.3.1.20260727
+ + types-pyyaml==6.0.12.20260906
+ + types-requests==2.33.0.20260906
+ + types-xmltodict==1.0.1.20260518
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + tzdata==2026.5
+ + uart-devices==0.1.1
+ + ulid-transform==2.2.9
+ + unidiff==1.0.1
+ + urllib3==2.8.0
+ + usb-devices==0.5.1
+ + uv==0.12.23
+ + victron-energy-meter==0.0.0 (from file:///home/runner/work/core/core/_ci/victron-energy-meter)
+ + voluptuous==0.16.0
+ + webrtc-models==0.3.0
+ + yamllint==1.38.0
+ + yarl==1.25.1
+ + zeroconf==0.151.5
+ + zizmor==1.30.1
+== hassfest generate
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/core/core/script/hassfest/__main__.py", line 9, in <module>
+    from . import (
+    ...<30 lines>...
+    )
+  File "/home/runner/work/core/core/script/hassfest/device_classes.py", line 10, in <module>
+    from homeassistant.components.infrared import InfraredDeviceClass
+  File "/home/runner/work/core/core/homeassistant/components/infrared/__init__.py", line 12, in <module>
+    from .const import DATA_COMPONENT, DOMAIN
+  File "/home/runner/work/core/core/homeassistant/components/infrared/const.py", line 8, in <module>
+    from .entity import InfraredEmitterEntity, InfraredReceiverEntity
+  File "/home/runner/work/core/core/homeassistant/components/infrared/entity.py", line 10, in <module>
+    from infrared_protocols.commands import Command as InfraredCommand
+ModuleNotFoundError: No module named 'infrared_protocols'
+== gen_requirements_all
+== translations
+Generating translations for victron_energy_meter
+== ruff format
+7 files reformatted, 9 files left unchanged
+== ruff check
+RUF005 Consider `[*_big(1050, 2), 5001, 12]` instead of concatenation
+   --> tests/components/victron_energy_meter/__init__.py:133:17
+    |
+131 |         0x3020: [22980, 57],
+132 |         0x3022: _big(100, 2) + _big(130, 2) + _big(400_000, 2) + _big(0, 2),
+133 |         0x3030: _big(1050, 2) + [5001, 12],
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+134 |         0x3034: _big(2_134_567, 2) + _big(123_456, 2) + [0, 45, 625, 0],
+135 |         0x303C: _big(1, 2) + [50012],
+    |
+help: Replace with `[*_big(1050, 2), 5001, 12]`
+
+RUF005 Consider `[*_big(1, 2), 50012]` instead of concatenation
+   --> tests/components/victron_energy_meter/__init__.py:135:17
+    |
+133 |         0x3030: _big(1050, 2) + [5001, 12],
+134 |         0x3034: _big(2_134_567, 2) + _big(123_456, 2) + [0, 45, 625, 0],
+135 |         0x303C: _big(1, 2) + [50012],
+    |                 ^^^^^^^^^^^^^^^^^^^^
+136 |         0x3046: [39850, 960],
+137 |         0x304E: [40010, -834 & 0xFFFF],
+    |
+help: Replace with `[*_big(1, 2), 50012]`
+
+Found 4 errors (2 fixed, 2 remaining).
+No fixes available (2 hidden fixes can be enabled with the `--unsafe-fixes` option).
+== pytest (snapshot update)
+ImportError while loading conftest '/home/runner/work/core/core/tests/conftest.py'.
+tests/conftest.py:135: in <module>
+    from .common import (  # noqa: E402, isort:skip
+tests/common.py:33: in <module>
+    from paho.mqtt.client import MQTTMessage
+E   ModuleNotFoundError: No module named 'paho'
+== pytest
+ImportError while loading conftest '/home/runner/work/core/core/tests/conftest.py'.
+tests/conftest.py:135: in <module>
+    from .common import (  # noqa: E402, isort:skip
+tests/common.py:33: in <module>
+    from paho.mqtt.client import MQTTMessage
+E   ModuleNotFoundError: No module named 'paho'
+== hassfest validate
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/core/core/script/hassfest/__main__.py", line 9, in <module>
+    from . import (
+    ...<30 lines>...
+    )
+  File "/home/runner/work/core/core/script/hassfest/device_classes.py", line 10, in <module>
+    from homeassistant.components.infrared import InfraredDeviceClass
+  File "/home/runner/work/core/core/homeassistant/components/infrared/__init__.py", line 12, in <module>
+    from .const import DATA_COMPONENT, DOMAIN
+  File "/home/runner/work/core/core/homeassistant/components/infrared/const.py", line 8, in <module>
+    from .entity import InfraredEmitterEntity, InfraredReceiverEntity
+  File "/home/runner/work/core/core/homeassistant/components/infrared/entity.py", line 10, in <module>
+    from infrared_protocols.commands import Command as InfraredCommand
+ModuleNotFoundError: No module named 'infrared_protocols'
+== mypy
+homeassistant/components/victron_energy_meter/sensor.py:620: error: Unused "type: ignore" comment  [unused-ignore]
+homeassistant/components/victron_energy_meter/config_flow.py:128: error: Method "async_step_zeroconf" is not using @override but is overriding a method in class "homeassistant.config_entries.ConfigFlow"  [explicit-override]
+homeassistant/components/frontend/__init__.py:459: error: Returning Any from function declared to return "Path"  [no-any-return]
+homeassistant/components/matter/ble_proxy.py:42: error: Class cannot subclass "BleScanSource" (has type "Any")  [misc]
+homeassistant/components/matter/ble_proxy.py:92: error: Class cannot subclass "BleDeviceResolver" (has type "Any")  [misc]
+homeassistant/components/matter/entity.py:379: error: Returning Any from function declared to return "str"  [no-any-return]
+homeassistant/components/matter/update.py:135: error: Returning Any from function declared to return "str | None"  [no-any-return]
+homeassistant/components/matter/update.py:143: error: Returning Any from function declared to return "str | None"  [no-any-return]
+homeassistant/components/stream/recorder.py:150: error: Unused "type: ignore" comment  [unused-ignore]
+homeassistant/components/stream/recorder.py:151: error: Unused "type: ignore" comment  [unused-ignore]
+homeassistant/components/tts/__init__.py:1227: error: Unused "type: ignore" comment  [unused-ignore]
+homeassistant/components/tts/__init__.py:1228: error: Unused "type: ignore" comment  [unused-ignore]
+homeassistant/components/tts/__init__.py:1229: error: Unused "type: ignore" comment  [unused-ignore]
+Found 13 errors in 8 files (checked 10 source files)
+== pylint

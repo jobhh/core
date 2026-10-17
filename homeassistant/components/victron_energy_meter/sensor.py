@@ -197,56 +197,234 @@ def _carlo_gavazzi(meter: EM500Meter) -> list[VictronMeterSensorDescription]:
 
     sensors = [
         _sensor("active_power", m, attrgetter(f"{m}.active_power"), POWER),
-        _sensor("apparent_power", m, attrgetter(f"{m}.apparent_power"), APPARENT_POWER, enabled=False),
-        _sensor("reactive_power", m, attrgetter(f"{m}.reactive_power"), REACTIVE_POWER, enabled=False),
+        _sensor(
+            "apparent_power",
+            m,
+            attrgetter(f"{m}.apparent_power"),
+            APPARENT_POWER,
+            enabled=False,
+        ),
+        _sensor(
+            "reactive_power",
+            m,
+            attrgetter(f"{m}.reactive_power"),
+            REACTIVE_POWER,
+            enabled=False,
+        ),
         _sensor("power_factor", m, attrgetter(f"{m}.power_factor"), POWER_FACTOR),
         _sensor("frequency", m, attrgetter(f"{m}.frequency"), FREQUENCY),
         _sensor("energy_imported", e, attrgetter(f"{e}.energy_imported"), ENERGY),
-        _sensor("energy_imported_partial", e, attrgetter(f"{e}.energy_imported_partial"), ENERGY, enabled=False),
-        _sensor("reactive_energy_imported", e, attrgetter(f"{e}.reactive_energy_imported"), REACTIVE_ENERGY, enabled=False),
-        _sensor("energy_imported_tariff_1", "tariff_energy", attrgetter("tariff_energy.energy_imported_tariff_1"), ENERGY, enabled=False),
-        _sensor("energy_imported_tariff_2", "tariff_energy", attrgetter("tariff_energy.energy_imported_tariff_2"), ENERGY, enabled=False),
-        _sensor("active_power_demand", d, attrgetter(f"{d}.active_power_demand"), POWER, enabled=False),
-        _sensor("active_power_demand_max", d, attrgetter(f"{d}.active_power_demand_max"), POWER, enabled=False),
-        _sensor("apparent_power_demand", d, attrgetter(f"{d}.apparent_power_demand"), APPARENT_POWER, enabled=False),
-        _sensor("apparent_power_demand_max", d, attrgetter(f"{d}.apparent_power_demand_max"), APPARENT_POWER, enabled=False),
-        _sensor("run_hours", e, attrgetter(f"{e}.run_hours"), HOURS, enabled=False, diagnostic=True),
-        _sensor("run_hours_lifetime", e, attrgetter(f"{e}.run_hours_lifetime"), HOURS, enabled=False, diagnostic=True),
-        _enum_sensor("active_tariff", "status", attrgetter("status.active_tariff"), Tariff),
-        _enum_sensor("device_state", "status", attrgetter("status.device_state"), DeviceState),
+        _sensor(
+            "energy_imported_partial",
+            e,
+            attrgetter(f"{e}.energy_imported_partial"),
+            ENERGY,
+            enabled=False,
+        ),
+        _sensor(
+            "reactive_energy_imported",
+            e,
+            attrgetter(f"{e}.reactive_energy_imported"),
+            REACTIVE_ENERGY,
+            enabled=False,
+        ),
+        _sensor(
+            "energy_imported_tariff_1",
+            "tariff_energy",
+            attrgetter("tariff_energy.energy_imported_tariff_1"),
+            ENERGY,
+            enabled=False,
+        ),
+        _sensor(
+            "energy_imported_tariff_2",
+            "tariff_energy",
+            attrgetter("tariff_energy.energy_imported_tariff_2"),
+            ENERGY,
+            enabled=False,
+        ),
+        _sensor(
+            "active_power_demand",
+            d,
+            attrgetter(f"{d}.active_power_demand"),
+            POWER,
+            enabled=False,
+        ),
+        _sensor(
+            "active_power_demand_max",
+            d,
+            attrgetter(f"{d}.active_power_demand_max"),
+            POWER,
+            enabled=False,
+        ),
+        _sensor(
+            "apparent_power_demand",
+            d,
+            attrgetter(f"{d}.apparent_power_demand"),
+            APPARENT_POWER,
+            enabled=False,
+        ),
+        _sensor(
+            "apparent_power_demand_max",
+            d,
+            attrgetter(f"{d}.apparent_power_demand_max"),
+            APPARENT_POWER,
+            enabled=False,
+        ),
+        _sensor(
+            "run_hours",
+            e,
+            attrgetter(f"{e}.run_hours"),
+            HOURS,
+            enabled=False,
+            diagnostic=True,
+        ),
+        _sensor(
+            "run_hours_lifetime",
+            e,
+            attrgetter(f"{e}.run_hours_lifetime"),
+            HOURS,
+            enabled=False,
+            diagnostic=True,
+        ),
+        _enum_sensor(
+            "active_tariff", "status", attrgetter("status.active_tariff"), Tariff
+        ),
+        _enum_sensor(
+            "device_state", "status", attrgetter("status.device_state"), DeviceState
+        ),
     ]
     if export:
         sensors += [
             _sensor("energy_exported", e, attrgetter(f"{e}.energy_exported"), ENERGY),
-            _sensor("energy_exported_partial", e, attrgetter(f"{e}.energy_exported_partial"), ENERGY, enabled=False),
-            _sensor("reactive_energy_exported", e, attrgetter(f"{e}.reactive_energy_exported"), REACTIVE_ENERGY, enabled=False),
+            _sensor(
+                "energy_exported_partial",
+                e,
+                attrgetter(f"{e}.energy_exported_partial"),
+                ENERGY,
+                enabled=False,
+            ),
+            _sensor(
+                "reactive_energy_exported",
+                e,
+                attrgetter(f"{e}.reactive_energy_exported"),
+                REACTIVE_ENERGY,
+                enabled=False,
+            ),
         ]
     if neutral:
         sensors += [
-            _sensor("neutral_current", q, attrgetter(f"{q}.neutral_current"), CURRENT, enabled=False),
+            _sensor(
+                "neutral_current",
+                q,
+                attrgetter(f"{q}.neutral_current"),
+                CURRENT,
+                enabled=False,
+            ),
         ]
     if len(phases) == 3:
         sensors += [
-            _enum_sensor("phase_sequence", m, attrgetter(f"{m}.phase_sequence"), CarloGavazziPhaseSequence),
+            _enum_sensor(
+                "phase_sequence",
+                m,
+                attrgetter(f"{m}.phase_sequence"),
+                CarloGavazziPhaseSequence,
+            ),
         ]
     for n in phases:
         phase = f"L{n}"
         line = LINES[n]
         line_field = line.lower().replace("-", "_")
         sensors += [
-            _sensor(f"current_l{n}", m, attrgetter(f"{m}.current_l{n}"), CURRENT, translation_key="current_phase", phase=phase),
-            _sensor(f"active_power_l{n}", m, attrgetter(f"{m}.active_power_l{n}"), POWER, translation_key="active_power_phase", phase=phase),
-            _sensor(f"apparent_power_l{n}", m, attrgetter(f"{m}.apparent_power_l{n}"), APPARENT_POWER, translation_key="apparent_power_phase", phase=phase, enabled=False),
-            _sensor(f"reactive_power_l{n}", m, attrgetter(f"{m}.reactive_power_l{n}"), REACTIVE_POWER, translation_key="reactive_power_phase", phase=phase, enabled=False),
-            _sensor(f"power_factor_l{n}", m, attrgetter(f"{m}.power_factor_l{n}"), POWER_FACTOR, translation_key="power_factor_phase", phase=phase, enabled=False),
-            _sensor(f"voltage_{line_field}", m, attrgetter(f"{m}.voltage_{line_field}"), VOLTAGE, translation_key="voltage_line", phase=line, enabled=False),
-            _sensor(f"energy_imported_l{n}", e, attrgetter(f"{e}.energy_imported_l{n}"), ENERGY, translation_key="energy_imported_phase", phase=phase, enabled=False),
-            _sensor(f"thd_current_l{n}", q, attrgetter(f"{q}.thd_current_l{n}"), PERCENT, translation_key="thd_current_phase", phase=phase, enabled=False),
+            _sensor(
+                f"current_l{n}",
+                m,
+                attrgetter(f"{m}.current_l{n}"),
+                CURRENT,
+                translation_key="current_phase",
+                phase=phase,
+            ),
+            _sensor(
+                f"active_power_l{n}",
+                m,
+                attrgetter(f"{m}.active_power_l{n}"),
+                POWER,
+                translation_key="active_power_phase",
+                phase=phase,
+            ),
+            _sensor(
+                f"apparent_power_l{n}",
+                m,
+                attrgetter(f"{m}.apparent_power_l{n}"),
+                APPARENT_POWER,
+                translation_key="apparent_power_phase",
+                phase=phase,
+                enabled=False,
+            ),
+            _sensor(
+                f"reactive_power_l{n}",
+                m,
+                attrgetter(f"{m}.reactive_power_l{n}"),
+                REACTIVE_POWER,
+                translation_key="reactive_power_phase",
+                phase=phase,
+                enabled=False,
+            ),
+            _sensor(
+                f"power_factor_l{n}",
+                m,
+                attrgetter(f"{m}.power_factor_l{n}"),
+                POWER_FACTOR,
+                translation_key="power_factor_phase",
+                phase=phase,
+                enabled=False,
+            ),
+            _sensor(
+                f"voltage_{line_field}",
+                m,
+                attrgetter(f"{m}.voltage_{line_field}"),
+                VOLTAGE,
+                translation_key="voltage_line",
+                phase=line,
+                enabled=False,
+            ),
+            _sensor(
+                f"energy_imported_l{n}",
+                e,
+                attrgetter(f"{e}.energy_imported_l{n}"),
+                ENERGY,
+                translation_key="energy_imported_phase",
+                phase=phase,
+                enabled=False,
+            ),
+            _sensor(
+                f"thd_current_l{n}",
+                q,
+                attrgetter(f"{q}.thd_current_l{n}"),
+                PERCENT,
+                translation_key="thd_current_phase",
+                phase=phase,
+                enabled=False,
+            ),
         ]
         if neutral:
             sensors += [
-                _sensor(f"voltage_l{n}", m, attrgetter(f"{m}.voltage_l{n}_n"), VOLTAGE, translation_key="voltage_phase", phase=phase),
-                _sensor(f"thd_voltage_l{n}", q, attrgetter(f"{q}.thd_voltage_l{n}_n"), PERCENT, translation_key="thd_voltage_phase", phase=phase, enabled=False),
+                _sensor(
+                    f"voltage_l{n}",
+                    m,
+                    attrgetter(f"{m}.voltage_l{n}_n"),
+                    VOLTAGE,
+                    translation_key="voltage_phase",
+                    phase=phase,
+                ),
+                _sensor(
+                    f"thd_voltage_l{n}",
+                    q,
+                    attrgetter(f"{q}.thd_voltage_l{n}_n"),
+                    PERCENT,
+                    translation_key="thd_voltage_phase",
+                    phase=phase,
+                    enabled=False,
+                ),
             ]
     return sensors
 
@@ -264,18 +442,43 @@ def _victron(meter: VictronEnergyMeter) -> list[VictronMeterSensorDescription]:
         _sensor("frequency", t, attrgetter(f"{t}.frequency"), FREQUENCY),
         _sensor("energy_imported", t, attrgetter(f"{t}.energy_forward"), ENERGY),
         _sensor("energy_exported", t, attrgetter(f"{t}.energy_reverse"), ENERGY),
-        _sensor("pe_n_voltage", t, attrgetter(f"{t}.pe_n_voltage"), VOLTAGE, enabled=False),
-        _sensor("error_code", t, attrgetter(f"{t}.error_code"), _Kind(device_class=None, unit=None, state_class=None), enabled=False, diagnostic=True),
+        _sensor(
+            "pe_n_voltage", t, attrgetter(f"{t}.pe_n_voltage"), VOLTAGE, enabled=False
+        ),
+        _sensor(
+            "error_code",
+            t,
+            attrgetter(f"{t}.error_code"),
+            _Kind(device_class=None, unit=None, state_class=None),
+            enabled=False,
+            diagnostic=True,
+        ),
     ]
     if v107:
         sensors += [
-            _sensor("neutral_current", t, attrgetter(f"{t}.neutral_current"), CURRENT, enabled=False),
+            _sensor(
+                "neutral_current",
+                t,
+                attrgetter(f"{t}.neutral_current"),
+                CURRENT,
+                enabled=False,
+            ),
         ]
     if v109:
         sensors += [
             _sensor("power_factor", t, attrgetter(f"{t}.power_factor"), POWER_FACTOR),
-            _enum_sensor("phase_sequence", t, attrgetter(f"{t}.phase_sequence"), VictronPhaseSequence),
-            _enum_sensor("phase_rotation", t, attrgetter(f"{t}.phase_rotation_alarm"), PhaseRotationAlarm),
+            _enum_sensor(
+                "phase_sequence",
+                t,
+                attrgetter(f"{t}.phase_sequence"),
+                VictronPhaseSequence,
+            ),
+            _enum_sensor(
+                "phase_rotation",
+                t,
+                attrgetter(f"{t}.phase_rotation_alarm"),
+                PhaseRotationAlarm,
+            ),
         ]
     current_component = (
         "high_range_currents" if meter.high_range_currents is not None else None
@@ -284,22 +487,83 @@ def _victron(meter: VictronEnergyMeter) -> list[VictronMeterSensorDescription]:
         phase = f"L{n}"
         p = f"phase_l{n}"
         sensors += [
-            _sensor(f"voltage_l{n}", p, attrgetter(f"{p}.voltage"), VOLTAGE, translation_key="voltage_phase", phase=phase),
-            _sensor(f"current_l{n}", current_component or p, methodcaller("current", n), CURRENT, translation_key="current_phase", phase=phase),
-            _sensor(f"active_power_l{n}", p, attrgetter(f"{p}.active_power"), POWER, translation_key="active_power_phase", phase=phase),
-            _sensor(f"apparent_power_l{n}", p, attrgetter(f"{p}.apparent_power"), APPARENT_POWER, translation_key="apparent_power_phase", phase=phase, enabled=False),
-            _sensor(f"energy_imported_l{n}", p, attrgetter(f"{p}.energy_forward"), ENERGY, translation_key="energy_imported_phase", phase=phase, enabled=False),
-            _sensor(f"energy_exported_l{n}", p, attrgetter(f"{p}.energy_reverse"), ENERGY, translation_key="energy_exported_phase", phase=phase, enabled=False),
+            _sensor(
+                f"voltage_l{n}",
+                p,
+                attrgetter(f"{p}.voltage"),
+                VOLTAGE,
+                translation_key="voltage_phase",
+                phase=phase,
+            ),
+            _sensor(
+                f"current_l{n}",
+                current_component or p,
+                methodcaller("current", n),
+                CURRENT,
+                translation_key="current_phase",
+                phase=phase,
+            ),
+            _sensor(
+                f"active_power_l{n}",
+                p,
+                attrgetter(f"{p}.active_power"),
+                POWER,
+                translation_key="active_power_phase",
+                phase=phase,
+            ),
+            _sensor(
+                f"apparent_power_l{n}",
+                p,
+                attrgetter(f"{p}.apparent_power"),
+                APPARENT_POWER,
+                translation_key="apparent_power_phase",
+                phase=phase,
+                enabled=False,
+            ),
+            _sensor(
+                f"energy_imported_l{n}",
+                p,
+                attrgetter(f"{p}.energy_forward"),
+                ENERGY,
+                translation_key="energy_imported_phase",
+                phase=phase,
+                enabled=False,
+            ),
+            _sensor(
+                f"energy_exported_l{n}",
+                p,
+                attrgetter(f"{p}.energy_reverse"),
+                ENERGY,
+                translation_key="energy_exported_phase",
+                phase=phase,
+                enabled=False,
+            ),
         ]
         if meter.detail(n) is not None:
             detail = f"detail_l{n}"
             line = LINES[n]
             sensors += [
-                _sensor(f"voltage_{line.lower().replace('-', '_')}", detail, attrgetter(f"{detail}.voltage_line_to_line"), VOLTAGE, translation_key="voltage_line", phase=line, enabled=False),
+                _sensor(
+                    f"voltage_{line.lower().replace('-', '_')}",
+                    detail,
+                    attrgetter(f"{detail}.voltage_line_to_line"),
+                    VOLTAGE,
+                    translation_key="voltage_line",
+                    phase=line,
+                    enabled=False,
+                ),
             ]
             if v109:
                 sensors += [
-                    _sensor(f"power_factor_l{n}", detail, attrgetter(f"{detail}.power_factor"), POWER_FACTOR, translation_key="power_factor_phase", phase=phase, enabled=False),
+                    _sensor(
+                        f"power_factor_l{n}",
+                        detail,
+                        attrgetter(f"{detail}.power_factor"),
+                        POWER_FACTOR,
+                        translation_key="power_factor_phase",
+                        phase=phase,
+                        enabled=False,
+                    ),
                 ]
     return sensors
 
