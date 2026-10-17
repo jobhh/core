@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "victron-energy-meter"
+version = "0.0.0"
+description = "Read Victron Energy VM-3P75CT and VM-3P5A energy meters over Modbus UDP."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "victron-energy-meter contributors" }]
+keywords = [
+    "modbus",
+    "victron",
+    "vm-3p75ct",
+    "vm-3p5a",
+    "energy-meter",
+    "home-assistant",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Home Automation",
+    "Typing :: Typed",
+]
+# The caller injects a ModbusUnit; tmodbus is the backend Home Assistant uses.
+dependencies = ["modbus-connection[tmodbus]>=4.12.1"]
+
+[project.urls]
+Homepage = "https://github.com/jobhh/victron-energy-meter"
+Issues = "https://github.com/jobhh/victron-energy-meter/issues"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.11",
+    "pytest>=8",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.6",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/victron_energy_meter"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "D"]
+# D107 is covered by the class docstring. D401 wants imperative docstrings;
+# this codebase names things ("The meter model"), like modbus-connection.
+ignore = ["D107", "D401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+# A test's name is its documentation.
+"tests/*" = ["D100", "D103", "D104"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests", "script"]
+strict = true
