@@ -8056,6 +8056,12 @@
         }
       }
     },
+    "victron_energy_meter": {
+      "name": "Victron Energy Meter",
+      "integration_type": "device",
+      "config_flow": true,
+      "iot_class": "local_polling"
+    },
     "vilfo": {
       "name": "Vilfo Router",
       "integration_type": "device",

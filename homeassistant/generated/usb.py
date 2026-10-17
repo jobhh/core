@@ -226,6 +226,7 @@ USB_DEPENDENTS = [
     "tonewinner",
     "upb",
     "velbus",
+    "victron_energy_meter",
     "zha",
     "zwave_js",
 ]

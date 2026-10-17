@@ -30,21 +30,6 @@
  + zeroconf==0.151.5
  + zizmor==1.30.1
 == hassfest generate
-  File "/home/runner/work/core/core/homeassistant/components/camera/img_util.py", line 91, in __init__
-    TurboJPEGSingleton.__instance = TurboJPEG()
-                                    ~~~~~~~~~^^
-  File "/home/runner/work/core/core/.venv/lib/python3.14/site-packages/turbojpeg.py", line 301, in __init__
-    self.__find_turbojpeg() if lib_path is None else lib_path)
-    ~~~~~~~~~~~~~~~~~~~~~^^
-  File "/home/runner/work/core/core/.venv/lib/python3.14/site-packages/turbojpeg.py", line 996, in __find_turbojpeg
-    raise RuntimeError(
-    ...<2 lines>...
-        'e.g. jpeg = TurboJPEG(lib_path)')
-RuntimeError: Unable to locate turbojpeg library automatically. You may specify the turbojpeg library path manually.
-e.g. jpeg = TurboJPEG(lib_path)
- done in 1.81s
-Validating ssdp... done in 0.01s
-Validating translations... done in 0.66s
 Validating triggers... done in 0.08s
 Validating usb... done in 0.01s
 Validating zeroconf... done in 0.01s
@@ -58,17 +43,7 @@ Validating metadata... done in 0.00s
 Validating sensor... done in 0.00s
 
 Integrations: 1527
-Invalid integrations: 1
-
-Found errors. Generating files canceled.
-
-Integration victron_energy_meter:
-* [ERROR] [QUALITY_SCALE] Quality scale tier bronze requires quality scale rules to be met:
-  brands: todo
-  dependency-transparency: todo
-  docs-high-level-description: todo
-  docs-installation-instructions: todo
-  docs-removal-instructions: todo
+Invalid integrations: 0
 
 == gen_requirements_all
 == translations
@@ -78,67 +53,212 @@ Generating translations for victron_energy_meter
 == ruff check
 All checks passed!
 == pytest (snapshot update)
-ImportError while loading conftest '/home/runner/work/core/core/tests/components/conftest.py'.
-tests/components/conftest.py:15: in <module>
-    from aiohasupervisor import SupervisorClient, SupervisorNotFoundError
-E   ModuleNotFoundError: No module named 'aiohasupervisor'
+INFO:homeassistant.loader:Loaded button from homeassistant.components.button
+INFO:homeassistant.setup:Setting up button
+INFO:homeassistant.components.button:Setting up victron_energy_meter.button
+------------------------------ Captured log call -------------------------------
+2026-10-17 04:31:18.072 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded victron_energy_meter from homeassistant.components.victron_energy_meter
+2026-10-17 04:31:18.073 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded modbus from homeassistant.components.modbus
+2026-10-17 04:31:18.073 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded usb from homeassistant.components.usb
+2026-10-17 04:31:18.073 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded websocket_api from homeassistant.components.websocket_api
+2026-10-17 04:31:18.074 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded http from homeassistant.components.http
+2026-10-17 04:31:18.074 INFO     MainThread homeassistant.setup:setup.py:389 Setting up modbus
+2026-10-17 04:31:18.076 INFO     MainThread homeassistant.setup:setup.py:389 Setting up http
+2026-10-17 04:31:18.076 WARNING  MainThread aiohttp_fast_zlib:__init__.py:55 zlib_ng and isal are not available, falling back to zlib, performance will be degraded.
+2026-10-17 04:31:18.077 INFO     MainThread homeassistant.components.http.config:config.py:295 Using stable HTTP config
+2026-10-17 04:31:18.079 INFO     MainThread homeassistant.setup:setup.py:389 Setting up websocket_api
+2026-10-17 04:31:18.079 INFO     MainThread homeassistant.setup:setup.py:389 Setting up usb
+2026-10-17 04:31:18.080 INFO     MainThread homeassistant.setup:setup.py:389 Setting up victron_energy_meter
+2026-10-17 04:31:18.083 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded button from homeassistant.components.button
+2026-10-17 04:31:18.084 INFO     MainThread homeassistant.setup:setup.py:389 Setting up button
+2026-10-17 04:31:18.085 INFO     MainThread homeassistant.components.button:entity_platform.py:484 Setting up victron_energy_meter.button
+=============================== warnings summary ===============================
+tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[gateway]
+  /home/runner/work/core/core/homeassistant/components/victron_energy_meter/helpers.py:38: DeprecationWarning: ModbusTcpParams(framer='rtu') is deprecated. RTU frames a serial line, so carrying it over a socket is a serial link: use ModbusSerialParams(device="socket://192.168.1.60:502", framer='rtu') instead.
+    return ModbusTcpParams(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+--------------------------- snapshot report summary ----------------------------
+188 snapshots generated.
+=========================== short test summary info ============================
+FAILED tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[em540] - RuntimeError: Detected code that calls `device_registry.async_get_device`, which is deprecated because device identifiers and connections are no longer unique across config entries; use `async_get_device_by_identifier`, `async_get_device_by_connection` or `async_get_devices` instead. Please report this issue
+FAILED tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[vm] - RuntimeError: Detected code that calls `device_registry.async_get_device`, which is deprecated because device identifiers and connections are no longer unique across config entries; use `async_get_device_by_identifier`, `async_get_device_by_connection` or `async_get_devices` instead. Please report this issue
+FAILED tests/components/victron_energy_meter/test_init.py::test_phase_configuration_change_reloads[vm_3p75ct] - assert (1, 2, 3) == (1,)
+  
+  Left contains 2 more items, first extra item: 2
+  
+  Full diff:
+    (
+        1,
+  +     2,
+  +     3,
+    )
+FAILED tests/components/victron_energy_meter/test_platforms.py::test_entities[binary_sensor-vm_3p75ct] - assert []
+FAILED tests/components/victron_energy_meter/test_platforms.py::test_entities[button-vm_3p75ct] - assert []
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[serial] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[gateway] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[network] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_cannot_connect_then_recover - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_unsupported_meter - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_unsupported_firmware[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_no_serial_number - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_already_configured - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_zeroconf[vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_zeroconf_updates_the_host[vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_zeroconf_cannot_connect[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_reconfigure - Failed: Translation not found for victron_energy_meter: `config.step.reconfigure.data_description.device`. Please add to homeassistant/components/victron_energy_meter/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_reconfigure_errors_then_wrong_meter - Failed: Translation not found for victron_energy_meter: `config.step.reconfigure.data_description.device`. Please add to homeassistant/components/victron_energy_meter/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_link_in_use - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_diagnostics.py::test_diagnostics[em540] - Failed: Translation not found for button: `services.press.name`. Please add to homeassistant/components/button/strings.json
+ERROR tests/components/victron_energy_meter/test_diagnostics.py::test_diagnostics[vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[em540] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[vm] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_meter_not_answering_retries - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_unsupported_meter_fails_setup - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_old_firmware_fails_setup[vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_another_meter_on_the_address_fails_setup - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_link_in_use_fails_setup - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_meter_going_offline - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_refused_block_marks_only_its_entities_unavailable - Failed: Translation not found for modbus: `services.stop.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_phase_configuration_change_reloads[vm_3p75ct] - Failed: Translation not found for modbus: `services.stop.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[binary_sensor-em540] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[binary_sensor-vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[button-em540] - Failed: Translation not found for button: `services.press.name`. Please add to homeassistant/components/button/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[button-vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[sensor-em540] - Failed: Translation not found for modbus: `services.stop.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[sensor-vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_reset_buttons[button.em540_pfc_reset_partial_counters-16388] - Failed: Translation not found for modbus: `services.stop.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_reset_buttons[button.em540_pfc_reset_demand-16389] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_reset_buttons[button.em540_pfc_reset_tariff_counters-16390] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_refused_command_raises - Failed: Translation not found for button: `services.press.name`. Please add to homeassistant/components/button/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_victron_meter_has_no_buttons_or_binary_sensors[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+5 failed, 32 passed, 1 warning, 37 errors in 4.12s
 == pytest
-ImportError while loading conftest '/home/runner/work/core/core/tests/components/conftest.py'.
-tests/components/conftest.py:15: in <module>
-    from aiohasupervisor import SupervisorClient, SupervisorNotFoundError
-E   ModuleNotFoundError: No module named 'aiohasupervisor'
+        entity_registry: er.EntityRegistry,
+        snapshot: SnapshotAssertion,
+        config_entry_id: str,
+    ) -> None:
+        """Snapshot a platform."""
+        entity_entries = er.async_entries_for_config_entry(entity_registry, config_entry_id)
+>       assert entity_entries
+E       assert []
+
+tests/common.py:1945: AssertionError
+----------------------------- Captured stderr call -----------------------------
+INFO:homeassistant.loader:Loaded victron_energy_meter from homeassistant.components.victron_energy_meter
+INFO:homeassistant.loader:Loaded usb from homeassistant.components.usb
+INFO:homeassistant.loader:Loaded modbus from homeassistant.components.modbus
+INFO:homeassistant.loader:Loaded websocket_api from homeassistant.components.websocket_api
+INFO:homeassistant.loader:Loaded http from homeassistant.components.http
+INFO:homeassistant.setup:Setting up modbus
+INFO:homeassistant.setup:Setting up http
+WARNING:aiohttp_fast_zlib:zlib_ng and isal are not available, falling back to zlib, performance will be degraded.
+INFO:homeassistant.components.http.config:Using stable HTTP config
+INFO:homeassistant.setup:Setting up websocket_api
+INFO:homeassistant.setup:Setting up usb
+INFO:homeassistant.setup:Setting up victron_energy_meter
+INFO:homeassistant.loader:Loaded button from homeassistant.components.button
+INFO:homeassistant.setup:Setting up button
+INFO:homeassistant.components.button:Setting up victron_energy_meter.button
+------------------------------ Captured log call -------------------------------
+2026-10-17 04:31:24.230 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded victron_energy_meter from homeassistant.components.victron_energy_meter
+2026-10-17 04:31:24.231 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded usb from homeassistant.components.usb
+2026-10-17 04:31:24.231 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded modbus from homeassistant.components.modbus
+2026-10-17 04:31:24.232 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded websocket_api from homeassistant.components.websocket_api
+2026-10-17 04:31:24.232 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded http from homeassistant.components.http
+2026-10-17 04:31:24.233 INFO     MainThread homeassistant.setup:setup.py:389 Setting up modbus
+2026-10-17 04:31:24.235 INFO     MainThread homeassistant.setup:setup.py:389 Setting up http
+2026-10-17 04:31:24.235 WARNING  MainThread aiohttp_fast_zlib:__init__.py:55 zlib_ng and isal are not available, falling back to zlib, performance will be degraded.
+2026-10-17 04:31:24.235 INFO     MainThread homeassistant.components.http.config:config.py:295 Using stable HTTP config
+2026-10-17 04:31:24.237 INFO     MainThread homeassistant.setup:setup.py:389 Setting up websocket_api
+2026-10-17 04:31:24.238 INFO     MainThread homeassistant.setup:setup.py:389 Setting up usb
+2026-10-17 04:31:24.239 INFO     MainThread homeassistant.setup:setup.py:389 Setting up victron_energy_meter
+2026-10-17 04:31:24.242 INFO     SyncWorker_0 homeassistant.loader:loader.py:854 Loaded button from homeassistant.components.button
+2026-10-17 04:31:24.242 INFO     MainThread homeassistant.setup:setup.py:389 Setting up button
+2026-10-17 04:31:24.243 INFO     MainThread homeassistant.components.button:entity_platform.py:484 Setting up victron_energy_meter.button
+=============================== warnings summary ===============================
+tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[gateway]
+  /home/runner/work/core/core/homeassistant/components/victron_energy_meter/helpers.py:38: DeprecationWarning: ModbusTcpParams(framer='rtu') is deprecated. RTU frames a serial line, so carrying it over a socket is a serial link: use ModbusSerialParams(device="socket://192.168.1.60:502", framer='rtu') instead.
+    return ModbusTcpParams(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.14.5-final-0 ________________
+
+Name                                                             Stmts   Miss  Cover   Missing
+----------------------------------------------------------------------------------------------
+homeassistant/components/victron_energy_meter/__init__.py           42      0   100%
+homeassistant/components/victron_energy_meter/binary_sensor.py      28      0   100%
+homeassistant/components/victron_energy_meter/button.py             33      0   100%
+homeassistant/components/victron_energy_meter/config_flow.py        83      0   100%
+homeassistant/components/victron_energy_meter/const.py              17      0   100%
+homeassistant/components/victron_energy_meter/coordinator.py        41      1    98%   58
+homeassistant/components/victron_energy_meter/diagnostics.py        25      2    92%   31-32
+homeassistant/components/victron_energy_meter/entity.py             24      0   100%
+homeassistant/components/victron_energy_meter/helpers.py            30      0   100%
+homeassistant/components/victron_energy_meter/sensor.py            123      0   100%
+----------------------------------------------------------------------------------------------
+TOTAL                                                              446      3    99%
+--------------------------- snapshot report summary ----------------------------
+188 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[em540] - RuntimeError: Detected code that calls `device_registry.async_get_device`, which is deprecated because device identifiers and connections are no longer unique across config entries; use `async_get_device_by_identifier`, `async_get_device_by_connection` or `async_get_devices` instead. Please report this issue
+FAILED tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[vm] - RuntimeError: Detected code that calls `device_registry.async_get_device`, which is deprecated because device identifiers and connections are no longer unique across config entries; use `async_get_device_by_identifier`, `async_get_device_by_connection` or `async_get_devices` instead. Please report this issue
+FAILED tests/components/victron_energy_meter/test_init.py::test_phase_configuration_change_reloads[vm_3p75ct] - assert (1, 2, 3) == (1,)
+  
+  Left contains 2 more items, first extra item: 2
+  
+  Full diff:
+    (
+        1,
+  +     2,
+  +     3,
+    )
+FAILED tests/components/victron_energy_meter/test_platforms.py::test_entities[binary_sensor-vm_3p75ct] - assert []
+FAILED tests/components/victron_energy_meter/test_platforms.py::test_entities[button-vm_3p75ct] - assert []
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[serial] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[gateway] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_user_flow[network] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_cannot_connect_then_recover - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_unsupported_meter - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_unsupported_firmware[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_no_serial_number - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_already_configured - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_zeroconf[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_zeroconf_updates_the_host[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_zeroconf_cannot_connect[vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_reconfigure - Failed: Translation not found for victron_energy_meter: `config.step.reconfigure.data_description.device`. Please add to homeassistant/components/victron_energy_meter/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_reconfigure_errors_then_wrong_meter - Failed: Translation not found for victron_energy_meter: `config.step.reconfigure.data_description.device`. Please add to homeassistant/components/victron_energy_meter/strings.json
+ERROR tests/components/victron_energy_meter/test_config_flow.py::test_link_in_use - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_diagnostics.py::test_diagnostics[em540] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_diagnostics.py::test_diagnostics[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[em540] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_setup_and_unload[vm] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_meter_not_answering_retries - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_unsupported_meter_fails_setup - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_old_firmware_fails_setup[vm_3p75ct] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_another_meter_on_the_address_fails_setup - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_link_in_use_fails_setup - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_meter_going_offline - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_refused_block_marks_only_its_entities_unavailable - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_init.py::test_phase_configuration_change_reloads[vm_3p75ct] - Failed: Translation not found for modbus: `services.stop.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[binary_sensor-em540] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[binary_sensor-vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[button-em540] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[button-vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[sensor-em540] - Failed: Translation not found for modbus: `services.reload.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_entities[sensor-vm_3p75ct] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_reset_buttons[button.em540_pfc_reset_partial_counters-16388] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_reset_buttons[button.em540_pfc_reset_demand-16389] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_reset_buttons[button.em540_pfc_reset_tariff_counters-16390] - Failed: Translation not found for modbus: `services.write_register.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_refused_command_raises - Failed: Translation not found for modbus: `services.stop.name`. Please add to homeassistant/components/modbus/strings.json
+ERROR tests/components/victron_energy_meter/test_platforms.py::test_victron_meter_has_no_buttons_or_binary_sensors[vm_3p75ct] - Failed: Translation not found for modbus: `services.write_coil.name`. Please add to homeassistant/components/modbus/strings.json
+5 failed, 32 passed, 1 warning, 37 errors in 3.89s
 == hassfest validate
-Validating conditions... done in 0.07s
-Validating config_schema... done in 0.82s
-Validating dependencies... done in 1.93s
-Validating dhcp... done in 0.01s
-Validating icons... done in 0.25s
-Validating integration_info... done in 0.01s
-Validating integration_type... done in 0.00s
-Validating json... done in 0.00s
-Validating labs... done in 0.00s
-Validating manifest... done in 0.02s
-Validating mqtt... done in 0.00s
-Validating quality_scale... done in 2.58s
-Validating requirements... done in 0.01s
-Validating services...Error loading libturbojpeg; Camera snapshot performance will be sub-optimal
-Traceback (most recent call last):
-  File "/home/runner/work/core/core/homeassistant/components/camera/img_util.py", line 91, in __init__
-    TurboJPEGSingleton.__instance = TurboJPEG()
-                                    ~~~~~~~~~^^
-  File "/home/runner/work/core/core/.venv/lib/python3.14/site-packages/turbojpeg.py", line 301, in __init__
-    self.__find_turbojpeg() if lib_path is None else lib_path)
-    ~~~~~~~~~~~~~~~~~~~~~^^
-  File "/home/runner/work/core/core/.venv/lib/python3.14/site-packages/turbojpeg.py", line 996, in __find_turbojpeg
-    raise RuntimeError(
-    ...<2 lines>...
-        'e.g. jpeg = TurboJPEG(lib_path)')
-RuntimeError: Unable to locate turbojpeg library automatically. You may specify the turbojpeg library path manually.
-e.g. jpeg = TurboJPEG(lib_path)
- done in 1.18s
-Validating ssdp... done in 0.01s
-Validating translations... done in 0.69s
-Validating triggers... done in 0.07s
-Validating usb... done in 0.01s
-Validating zeroconf... done in 0.01s
-Validating config_flow... done in 0.05s
-Validating core_files... done in 0.00s
-Validating device_classes... done in 0.00s
-Validating docker... done in 0.00s
-Validating mdi_icons... done in 0.00s
-Validating mypy_config... done in 0.01s
-Validating metadata... done in 0.00s
-Validating sensor... done in 0.00s
+ done in 1.16s
 
 Integrations: 1527
 Invalid integrations: 1
-
-General errors:
-* [CODEOWNERS] File CODEOWNERS is not up to date. Run python3 -m script.hassfest
-* [USB] File usb.py is not up to date. Run python3 -m script.hassfest
-* [ZEROCONF] File zeroconf.py is not up to date. Run python3 -m script.hassfest
-* [CONFIG_FLOW] File config_flows.py is not up to date. Run python3 -m script.hassfest
-* [CONFIG_FLOW] File integrations.json is not up to date. Run python3 -m script.hassfest
 
 Integration victron_energy_meter:
 * [ERROR] [QUALITY_SCALE] Quality scale tier bronze requires quality scale rules to be met:

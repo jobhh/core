@@ -2056,6 +2056,8 @@ CLAUDE.md @home-assistant/core
 /tests/components/vicare/ @CFenner @lackas
 /homeassistant/components/victron_ble/ @rajlaud
 /tests/components/victron_ble/ @rajlaud
+/homeassistant/components/victron_energy_meter/ @jobhh
+/tests/components/victron_energy_meter/ @jobhh
 /homeassistant/components/victron_gx/ @tomer-w
 /tests/components/victron_gx/ @tomer-w
 /homeassistant/components/victron_remote_monitoring/ @AndyTempel
