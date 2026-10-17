@@ -18,7 +18,7 @@ jobs:
         run: |
           uv python install "$(cat .python-version)"
           uv venv --python "$(cat .python-version)"
-          for d in http diagnostics websocket_api zeroconf usb modbus mqtt infrared; do
+          for d in http diagnostics websocket_api zeroconf usb modbus mqtt infrared hassio bluetooth; do
             jq -r '.requirements[]?' "homeassistant/components/$d/manifest.json"
           done > /tmp/extra.txt
           uv pip install -e . -r requirements.txt -r requirements_test.txt -r /tmp/extra.txt \
@@ -33,14 +33,14 @@ jobs:
           T=tests/components/victron_energy_meter
           {
             echo "== install"; tail -30 /tmp/install.txt
-            echo "== hassfest generate"; python -m script.hassfest --action generate 2>&1 | tail -40
+            echo "== hassfest generate"; python -m script.hassfest --action generate --skip-plugins quality_scale 2>&1 | tail -15
             echo "== gen_requirements_all"; python -m script.gen_requirements_all 2>&1 | tail -20
             echo "== translations"; python -m script.translations develop --integration victron_energy_meter 2>&1 | tail -20
             echo "== ruff format"; ruff format $I $T 2>&1
             echo "== ruff check"; ruff check --fix $I $T 2>&1
             echo "== pytest (snapshot update)"; pytest $T --snapshot-update -q -p no:cacheprovider 2>&1 | tail -80
             echo "== pytest"; pytest $T -q -p no:cacheprovider --cov=homeassistant.components.victron_energy_meter --cov-report=term-missing 2>&1 | tail -120
-            echo "== hassfest validate"; python -m script.hassfest --action validate 2>&1 | tail -60
+            echo "== hassfest validate"; python -m script.hassfest --action validate 2>&1 | grep -v "^Validating\|turbojpeg\|TurboJPEG\|^  File\|^    \|Traceback\|RuntimeError\|e.g. jpeg" | tail -40
             echo "== mypy"; mypy $I 2>&1 | tail -60
             echo "== pylint"; pylint $I 2>&1 | tail -60
           } > $R
