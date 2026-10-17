@@ -13,10 +13,12 @@ from homeassistant.core import HomeAssistant
 
 from . import (
     EM540_SERIAL,
+    ET340_SERIAL,
     NETWORK_ENTRY_DATA,
     SERIAL_ENTRY_DATA,
     VM_SERIAL,
     seed_em540,
+    seed_et340,
     seed_vm_3p75ct,
 )
 
@@ -25,7 +27,7 @@ from tests.common import MockConfigEntry
 
 @pytest.fixture
 def meter_kind() -> str:
-    """Which meter the mock answers as: ``em540`` or ``vm_3p75ct``."""
+    """Which meter the mock answers as: ``em540``, ``et340`` or ``vm_3p75ct``."""
     return "em540"
 
 
@@ -43,10 +45,8 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 def mock_connection(meter_kind: str) -> MockModbusConnection:
     """A mock link with unit 1 answering as the chosen meter."""
     connection = MockModbusConnection()
-    if meter_kind == "vm_3p75ct":
-        seed_vm_3p75ct(connection.for_unit(1))
-    else:
-        seed_em540(connection.for_unit(1))
+    seed = {"em540": seed_em540, "et340": seed_et340, "vm_3p75ct": seed_vm_3p75ct}
+    seed[meter_kind](connection.for_unit(1))
     return connection
 
 
@@ -94,6 +94,13 @@ def mock_config_entry(meter_kind: str) -> MockConfigEntry:
             unique_id=VM_SERIAL,
             data=NETWORK_ENTRY_DATA,
             title="VM-3P75CT",
+        )
+    if meter_kind == "et340":
+        return MockConfigEntry(
+            domain=DOMAIN,
+            unique_id=ET340_SERIAL,
+            data=SERIAL_ENTRY_DATA,
+            title="ET340",
         )
     return MockConfigEntry(
         domain=DOMAIN,

@@ -33,7 +33,7 @@ from .const import (
     DOMAIN,
     LinkType,
 )
-from .helpers import Meter, create_meter, create_modbus_params, meter_name, unit_id
+from .helpers import Meter, async_setup_meter, create_modbus_params, meter_name, unit_id
 
 UNIT_ID_SELECTOR = probatio.All(
     NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, min=1, max=247)),
@@ -193,8 +193,7 @@ class VictronEnergyMeterConfigFlow(ConfigFlow, domain=DOMAIN):
             async with async_get_temporary_unit(
                 self.hass, params, unit_id(data)
             ) as unit:
-                meter = create_meter(data, unit)
-                await meter.async_ensure_setup()
+                meter = await async_setup_meter(data, unit)
         except (ModbusError, HomeAssistantError) as err:
             return (
                 None,

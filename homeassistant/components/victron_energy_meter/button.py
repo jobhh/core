@@ -2,10 +2,11 @@
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
-from carlo_gavazzi_modbus import EM500Meter
+from carlo_gavazzi_modbus import EM500Meter, Meter as CarloGavazziMeter
 from modbus_connection import ModbusError
+from victron_energy_meter import VictronEnergyMeter
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory
@@ -26,7 +27,8 @@ class VictronMeterButtonDescription(
 ):
     """Describe a command button on a meter."""
 
-    press_fn: Callable[[EM500Meter], Awaitable[None]]
+    press_fn: Callable[[Any], Awaitable[None]]
+    supported_fn: Callable[[CarloGavazziMeter], bool] = lambda _: True
 
 
 # Resetting the lifetime counters is left out on purpose: it would break the
@@ -44,6 +46,8 @@ CARLO_GAVAZZI_BUTTONS = (
         translation_key="reset_demand",
         component="demand",
         press_fn=lambda meter: meter.async_reset_demand(),
+        # The EM300 series resets the demand with the partial counters.
+        supported_fn=lambda meter: isinstance(meter, EM500Meter),
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
@@ -52,6 +56,7 @@ CARLO_GAVAZZI_BUTTONS = (
         translation_key="reset_tariff_counters",
         component="tariff_energy",
         press_fn=lambda meter: meter.async_reset_tariff_counters(),
+        supported_fn=lambda meter: isinstance(meter, EM500Meter),
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
     ),
@@ -68,11 +73,13 @@ async def async_setup_entry(
     Victron's own meters accept no commands over Modbus.
     """
     runtime_data = entry.runtime_data
-    if not isinstance(runtime_data.meter, EM500Meter):
+    meter = runtime_data.meter
+    if isinstance(meter, VictronEnergyMeter):
         return
     async_add_entities(
-        VictronMeterButton(runtime_data, runtime_data.meter, description)
+        VictronMeterButton(runtime_data, meter, description)
         for description in CARLO_GAVAZZI_BUTTONS
+        if description.supported_fn(meter)
     )
 
 
@@ -84,7 +91,7 @@ class VictronMeterButton(VictronMeterEntity, ButtonEntity):
     def __init__(
         self,
         runtime_data: VictronMeterRuntimeData,
-        meter: EM500Meter,
+        meter: CarloGavazziMeter,
         description: VictronMeterButtonDescription,
     ) -> None:
         """Initialize the button."""

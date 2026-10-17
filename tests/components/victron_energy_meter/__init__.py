@@ -14,6 +14,8 @@ from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
 EM540_SERIAL = "BX12345678901"
 EM540_PFC = 1763
 VM_SERIAL = "HQ2401ABCDE"
+ET340_SERIAL = "KX12345"
+ET340 = 345
 
 SERIAL_INPUT = {CONF_DEVICE: "/dev/ttyUSB0", CONF_BAUDRATE: 9600, CONF_UNIT_ID: 1}
 GATEWAY_INPUT = {CONF_HOST: "192.168.1.60", CONF_PORT: 502, CONF_UNIT_ID: 1}
@@ -140,14 +142,65 @@ VM_HOLDING = _flatten(
 )
 
 
-def seed_em540(unit: MockModbusUnit, model_code: int = EM540_PFC) -> None:
-    """Seed an EM540 PFC on a three-phase connection with neutral.
+# The EM300 series shares the EM500 measurements up to 0x0033; the rest of
+# its map differs.
+ET340_INPUT = {
+    **{address: word for address, word in EM540_INPUT.items() if address < 0x0034},
+    **_flatten(
+        {
+            0x0032: 0,  # phase sequence correct
+            0x0034: _little(123_457, 2),
+            0x0036: _little(23_456, 2),
+            0x0038: _little(8800, 2),
+            0x003A: _little(52000, 2),
+            0x003C: _little(1_234, 2),
+            0x0040: _little(50_000, 2),
+            0x0042: _little(40_000, 2),
+            0x0044: _little(33_457, 2),
+            0x0046: _little(12345, 2),
+            0x0048: _little(678, 2),
+            0x004E: _little(25_000, 2),
+            0x0050: _little(3_457, 2),
+            0x005A: _little(123_456, 2),
+            0x0060: _little(1_000, 2),
+            0x0062: _little(2_000, 2),
+            0x0064: _little(3_000, 2),
+            0x0082: _little(312, 2),
+            0x0098: _little(123, 2),
+            0x0302: [1, 2],  # firmware B2
+            0x1105: 0,
+            # One character in the low byte of each register.
+            0x5000: [ord(c) for c in ET340_SERIAL],
+        }
+    ),
+}
+
+ET340_HOLDING = _flatten(
+    {
+        0x1002: 0,  # 3Pn
+        0x1010: _little(15, 2),
+        0x1101: 1,
+        0x1103: 1,  # mode B: export counters move
+        0x1104: 0,
+        0x1200: 1,
+        0x1201: 1,
+    }
+)
+
+
+def _seed_carlo_gavazzi(
+    unit: MockModbusUnit,
+    input_registers: dict[int, int],
+    holding_registers: dict[int, int],
+    model_code: int,
+) -> None:
+    """Seed a Carlo Gavazzi meter.
 
     0x000B answers the model code to a one-register read, and otherwise holds
     the high word of the L3-L1 voltage, as the protocol describes.
     """
-    unit.input.update(EM540_INPUT)
-    unit.holding.update(EM540_HOLDING)
+    unit.input.update(input_registers)
+    unit.holding.update(holding_registers)
     read = unit.read_input_registers
 
     async def read_input_registers(address: int, count: int) -> list[int]:
@@ -156,6 +209,16 @@ def seed_em540(unit: MockModbusUnit, model_code: int = EM540_PFC) -> None:
         return await read(address, count)
 
     unit.read_input_registers = read_input_registers  # type: ignore[method-assign]
+
+
+def seed_em540(unit: MockModbusUnit, model_code: int = EM540_PFC) -> None:
+    """Seed an EM540 PFC on a three-phase connection with neutral."""
+    _seed_carlo_gavazzi(unit, EM540_INPUT, EM540_HOLDING, model_code)
+
+
+def seed_et340(unit: MockModbusUnit) -> None:
+    """Seed an ET340 on a three-phase connection with neutral, in mode B."""
+    _seed_carlo_gavazzi(unit, ET340_INPUT, ET340_HOLDING, ET340)
 
 
 def seed_vm_3p75ct(unit: MockModbusUnit) -> None:
