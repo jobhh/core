@@ -18,7 +18,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 
-from . import EM540_SERIAL, VM_SERIAL
+from . import EM540_SERIAL, ET340_SERIAL, VM_SERIAL
 
 from tests.common import MockConfigEntry, async_fire_time_changed
 
@@ -27,6 +27,7 @@ from tests.common import MockConfigEntry, async_fire_time_changed
     ("meter_kind", "serial", "manufacturer", "model"),
     [
         pytest.param("em540", EM540_SERIAL, "Carlo Gavazzi", "EM540 PFC", id="em540"),
+        pytest.param("et340", ET340_SERIAL, "Carlo Gavazzi", "ET340", id="et340"),
         pytest.param("vm_3p75ct", VM_SERIAL, "Victron Energy", "VM-3P75CT", id="vm"),
     ],
 )
@@ -182,7 +183,6 @@ async def test_phase_configuration_change_reloads(
     assert hass.states.get("sensor.vm_3p75ct_voltage_l3") is not None
 
     mock_unit.holding[0x2000] = 0  # single phase on L1
-    mock_unit.read_events.clear()
     freezer.tick(SETTINGS_SCAN_INTERVAL + timedelta(seconds=1))
     async_fire_time_changed(hass)
     await hass.async_block_till_done(wait_background_tasks=True)

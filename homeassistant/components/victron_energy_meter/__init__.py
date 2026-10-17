@@ -31,7 +31,7 @@ from .coordinator import (
     VictronMeterRuntimeData,
     device_info,
 )
-from .helpers import create_meter, create_modbus_params, unit_id
+from .helpers import async_setup_meter, create_modbus_params, unit_id
 
 PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
@@ -52,9 +52,8 @@ async def async_setup_entry(
             translation_placeholders={"error": str(err)},
         ) from err
 
-    meter = create_meter(entry.data, unit)
     try:
-        await meter.async_ensure_setup()
+        meter = await async_setup_meter(entry.data, unit)
     except ModbusError as err:
         raise ConfigEntryNotReady(
             translation_domain=DOMAIN,

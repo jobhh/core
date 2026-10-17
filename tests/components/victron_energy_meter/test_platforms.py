@@ -23,6 +23,9 @@ from tests.common import MockConfigEntry, snapshot_platform
         pytest.param("em540", Platform.BINARY_SENSOR, id="em540-binary_sensor"),
         pytest.param("em540", Platform.BUTTON, id="em540-button"),
         pytest.param("em540", Platform.SENSOR, id="em540-sensor"),
+        pytest.param("et340", Platform.BINARY_SENSOR, id="et340-binary_sensor"),
+        pytest.param("et340", Platform.BUTTON, id="et340-button"),
+        pytest.param("et340", Platform.SENSOR, id="et340-sensor"),
         pytest.param("vm_3p75ct", Platform.SENSOR, id="vm_3p75ct-sensor"),
     ],
 )
@@ -44,11 +47,18 @@ async def test_entities(
 
 @pytest.mark.usefixtures("entity_registry_enabled_by_default", "init_integration")
 @pytest.mark.parametrize(
-    ("entity_id", "register"),
+    ("meter_kind", "entity_id", "register"),
     [
-        ("button.em540_pfc_reset_partial_counters", 0x4004),
-        ("button.em540_pfc_reset_demand", 0x4005),
-        ("button.em540_pfc_reset_tariff_counters", 0x4006),
+        pytest.param(
+            "em540", "button.em540_pfc_reset_partial_counters", 0x4004, id="partial"
+        ),
+        pytest.param("em540", "button.em540_pfc_reset_demand", 0x4005, id="demand"),
+        pytest.param(
+            "em540", "button.em540_pfc_reset_tariff_counters", 0x4006, id="tariff"
+        ),
+        pytest.param(
+            "et340", "button.et340_reset_partial_counters", 0x4000, id="et340-partial"
+        ),
     ],
 )
 async def test_reset_buttons(

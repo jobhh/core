@@ -30,7 +30,7 @@
           "port": "The port the gateway listens on.",
           "unit_id": "The Modbus address set on the meter. The default is 1."
         },
-        "description": "Set up a Carlo Gavazzi meter (EM530, EM540) behind an RS485-to-TCP gateway in transparent (RTU) mode."
+        "description": "Set up a Carlo Gavazzi meter (such as the EM540 or ET340) behind an RS485-to-TCP gateway in transparent (RTU) mode."
       },
       "network": {
         "data": {
@@ -69,7 +69,7 @@
           "device": "The serial port the meter's RS485 bus is wired to. ESPHome serial proxies are listed here too.",
           "unit_id": "[%key:component::victron_energy_meter::config::step::gateway::data_description::unit_id%]"
         },
-        "description": "Set up a Carlo Gavazzi meter (EM530, EM540) wired over RS485."
+        "description": "Set up a Carlo Gavazzi meter (such as the EM540 or ET340) wired over RS485."
       },
       "user": {
         "menu_options": {

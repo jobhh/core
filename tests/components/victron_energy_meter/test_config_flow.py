@@ -15,7 +15,14 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from . import EM540_SERIAL, GATEWAY_INPUT, NETWORK_INPUT, SERIAL_INPUT, VM_SERIAL
+from . import (
+    EM540_SERIAL,
+    ET340_SERIAL,
+    GATEWAY_INPUT,
+    NETWORK_INPUT,
+    SERIAL_INPUT,
+    VM_SERIAL,
+)
 
 from tests.common import MockConfigEntry
 
@@ -42,6 +49,14 @@ ZEROCONF_DISCOVERY = ZeroconfServiceInfo(
             EM540_SERIAL,
             "EM540 PFC",
             id="serial",
+        ),
+        pytest.param(
+            "et340",
+            LinkType.SERIAL,
+            SERIAL_INPUT,
+            ET340_SERIAL,
+            "ET340",
+            id="serial-et340",
         ),
         pytest.param(
             "em540",

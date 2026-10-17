@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from operator import attrgetter
 from typing import Any, override
 
-from carlo_gavazzi_modbus import EM500Meter
+from victron_energy_meter import VictronEnergyMeter
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -67,11 +67,14 @@ async def async_setup_entry(
     Victron's own meters report no on/off states.
     """
     runtime_data = entry.runtime_data
-    if not isinstance(runtime_data.meter, EM500Meter):
+    meter = runtime_data.meter
+    if isinstance(meter, VictronEnergyMeter):
         return
+    # The EM300 series reports only the wiring check.
     async_add_entities(
         VictronMeterBinarySensor(runtime_data, description)
         for description in CARLO_GAVAZZI_BINARY_SENSORS
+        if hasattr(getattr(meter, description.component), description.key)
     )
 
 

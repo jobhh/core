@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from carlo_gavazzi_modbus import EM500Meter
 from modbus_connection import ModbusError
+from victron_energy_meter import VictronEnergyMeter
 
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
@@ -33,9 +33,9 @@ async def async_get_config_entry_diagnostics(
 
     if raw is not None:
         serial_registers = (
-            _CARLO_GAVAZZI_SERIAL_REGISTERS
-            if isinstance(meter, EM500Meter)
-            else _VICTRON_SERIAL_REGISTERS
+            _VICTRON_SERIAL_REGISTERS
+            if isinstance(meter, VictronEnergyMeter)
+            else _CARLO_GAVAZZI_SERIAL_REGISTERS
         )
         for space in raw.values():
             for address in serial_registers:

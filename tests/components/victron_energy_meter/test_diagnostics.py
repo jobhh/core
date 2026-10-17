@@ -12,7 +12,7 @@ from tests.components.diagnostics import get_diagnostics_for_config_entry
 from tests.typing import ClientSessionGenerator
 
 
-@pytest.mark.parametrize("meter_kind", ["em540", "vm_3p75ct"])
+@pytest.mark.parametrize("meter_kind", ["em540", "et340", "vm_3p75ct"])
 async def test_diagnostics(
     hass: HomeAssistant,
     hass_client: ClientSessionGenerator,
