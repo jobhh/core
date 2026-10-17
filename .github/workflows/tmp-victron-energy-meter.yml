@@ -35,14 +35,14 @@ jobs:
             echo "== install"; tail -30 /tmp/install.txt
             echo "== hassfest generate"; python -m script.hassfest --action generate --skip-plugins quality_scale 2>&1 | tail -15
             echo "== gen_requirements_all"; python -m script.gen_requirements_all 2>&1 | tail -20
-            echo "== translations"; python -m script.translations develop --integration victron_energy_meter 2>&1 | tail -20
+            echo "== translations"; python -m script.translations develop --all 2>&1 | tail -5
             echo "== ruff format"; ruff format $I $T 2>&1
             echo "== ruff check"; ruff check --fix $I $T 2>&1
-            echo "== pytest (snapshot update)"; pytest $T --snapshot-update -q -p no:cacheprovider 2>&1 | tail -80
+            echo "== pytest (snapshot update)"; pytest $T --snapshot-update -q -p no:cacheprovider 2>&1 | grep -E "passed|failed|snapshot" | tail -5
             echo "== pytest"; pytest $T -q -p no:cacheprovider --cov=homeassistant.components.victron_energy_meter --cov-report=term-missing 2>&1 | tail -120
             echo "== hassfest validate"; python -m script.hassfest --action validate 2>&1 | grep -v "^Validating\|turbojpeg\|TurboJPEG\|^  File\|^    \|Traceback\|RuntimeError\|e.g. jpeg" | tail -40
             echo "== mypy"; mypy $I 2>&1 | tail -60
-            echo "== pylint"; pylint $I 2>&1 | tail -60
+            echo "== pylint"; pylint $I 2>&1 | tail -60; echo "pylint exit $?"
           } > $R
       - name: Commit the result
         if: always()

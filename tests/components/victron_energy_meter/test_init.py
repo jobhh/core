@@ -1,5 +1,6 @@
 """Tests for setting up the Victron Energy Meter integration."""
 
+from datetime import timedelta
 from unittest.mock import MagicMock
 
 from freezegun.api import FrozenDateTimeFactory
@@ -39,8 +40,8 @@ async def test_setup_and_unload(
 ) -> None:
     """Test a meter sets up as a device, and unloads."""
     assert init_integration.state is ConfigEntryState.LOADED
-    device = device_registry.async_get_device(
-        identifiers={("victron_energy_meter", serial)}
+    device = device_registry.async_get_device_by_identifier(
+        ("victron_energy_meter", serial), init_integration.entry_id
     )
     assert device is not None
     assert device.manufacturer == manufacturer
@@ -181,10 +182,30 @@ async def test_phase_configuration_change_reloads(
     assert hass.states.get("sensor.vm_3p75ct_voltage_l3") is not None
 
     mock_unit.holding[0x2000] = 0  # single phase on L1
-    freezer.tick(SETTINGS_SCAN_INTERVAL)
+    freezer.tick(SETTINGS_SCAN_INTERVAL + timedelta(seconds=1))
     async_fire_time_changed(hass)
-    await hass.async_block_till_done()
+    await hass.async_block_till_done(wait_background_tasks=True)
 
     assert init_integration.state is ConfigEntryState.LOADED
     assert init_integration.runtime_data.meter.phases == (1,)
     assert hass.states.get("sensor.vm_3p75ct_voltage_l1").state == "230.12"
+
+
+async def test_every_sub_system_refused_marks_the_meter_unavailable(
+    hass: HomeAssistant,
+    init_integration: MockConfigEntry,
+    mock_unit: MockModbusUnit,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Test a meter that answers but refuses every block counts as failed."""
+    for address in (0x0000, 0x0076, 0x009A, 0x0500, 0x0046, 0x0300, 0x1105, 0x5012):
+        mock_unit.fail_read(address, IllegalDataAddressError(), register_type="input")
+    freezer.tick(SCAN_INTERVAL)
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.em540_pfc_active_power").state == STATE_UNAVAILABLE
+    assert (
+        hass.states.get("binary_sensor.em540_pfc_wiring_error").state
+        == STATE_UNAVAILABLE
+    )

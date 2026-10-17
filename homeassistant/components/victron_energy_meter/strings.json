@@ -50,7 +50,14 @@
           "port": "[%key:common::config_flow::data::port%]",
           "unit_id": "[%key:component::victron_energy_meter::config::step::gateway::data::unit_id%]"
         },
-        "description": "Update how this meter is reached."
+        "description": "Update how this meter is reached.",
+        "data_description": {
+          "baudrate": "[%key:component::victron_energy_meter::config::step::serial::data_description::baudrate%]",
+          "device": "[%key:component::victron_energy_meter::config::step::serial::data_description::device%]",
+          "host": "The hostname or IP address of the meter, or of the gateway it is behind.",
+          "port": "[%key:component::victron_energy_meter::config::step::gateway::data_description::port%]",
+          "unit_id": "[%key:component::victron_energy_meter::config::step::gateway::data_description::unit_id%]"
+        }
       },
       "serial": {
         "data": {
