@@ -1,0 +1,151 @@
+# serializer version: 1
+# name: test_buttons[button.carlo_gavazzi_em540_reset_demand-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': <EntityCategory.CONFIG: 'config'>,
+    'entity_id': 'button.carlo_gavazzi_em540_reset_demand',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Reset demand',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Reset demand',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'reset_demand',
+    'unique_id': 'XX0000000000X_reset_demand',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_buttons[button.carlo_gavazzi_em540_reset_demand-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Reset demand',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.carlo_gavazzi_em540_reset_demand',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---
+# name: test_buttons[button.carlo_gavazzi_em540_reset_partial_counters-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': <EntityCategory.CONFIG: 'config'>,
+    'entity_id': 'button.carlo_gavazzi_em540_reset_partial_counters',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Reset partial counters',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Reset partial counters',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'reset_partial_counters',
+    'unique_id': 'XX0000000000X_reset_partial_counters',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_buttons[button.carlo_gavazzi_em540_reset_partial_counters-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Reset partial counters',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.carlo_gavazzi_em540_reset_partial_counters',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---
+# name: test_buttons[button.carlo_gavazzi_em540_reset_tariff_counters-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': <EntityCategory.CONFIG: 'config'>,
+    'entity_id': 'button.carlo_gavazzi_em540_reset_tariff_counters',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Reset tariff counters',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Reset tariff counters',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'reset_tariff_counters',
+    'unique_id': 'XX0000000000X_reset_tariff_counters',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_buttons[button.carlo_gavazzi_em540_reset_tariff_counters-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Reset tariff counters',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.carlo_gavazzi_em540_reset_tariff_counters',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---

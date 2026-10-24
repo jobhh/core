@@ -29,7 +29,7 @@ from .coordinator import (
 from .entity import meter_device_info
 from .helpers import create_modbus_params
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
 
 async def async_setup_entry(

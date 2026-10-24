@@ -68,6 +68,17 @@
         "name": "Wiring error"
       }
     },
+    "button": {
+      "reset_demand": {
+        "name": "Reset demand"
+      },
+      "reset_partial_counters": {
+        "name": "Reset partial counters"
+      },
+      "reset_tariff_counters": {
+        "name": "Reset tariff counters"
+      }
+    },
     "sensor": {
       "active_power_demand": {
         "name": "Active power demand"
@@ -167,6 +178,9 @@
     }
   },
   "exceptions": {
+    "command_failed": {
+      "message": "The meter did not carry out the command: {error}"
+    },
     "communication_error": {
       "message": "Could not communicate with the meter: {error}"
     },

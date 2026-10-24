@@ -14,6 +14,17 @@
         }
       }
     },
+    "button": {
+      "reset_demand": {
+        "default": "mdi:restore"
+      },
+      "reset_partial_counters": {
+        "default": "mdi:counter"
+      },
+      "reset_tariff_counters": {
+        "default": "mdi:counter"
+      }
+    },
     "sensor": {
       "active_tariff": {
         "default": "mdi:cash-clock"
