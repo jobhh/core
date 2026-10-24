@@ -3,13 +3,15 @@
 The meters are Modbus devices. This integration does not own a connection: it
 borrows a ``ModbusUnit`` from the ``modbus`` integration and hands it to the
 library for the kind of meter. Victron's VM-3P75CT and VM-3P5A use
-``victron-energy-meter``; the Carlo Gavazzi meters Victron sells use
-``carlo-gavazzi-modbus``.
+``victron-energy-meter-modbus``; the Carlo Gavazzi meters Victron sells use
+``carlo-gavazzi-energy-meter-modbus``.
 """
 
-from carlo_gavazzi_modbus import UnsupportedMeterError as CarloGavazziUnsupported
+from carlo_gavazzi_energy_meter_modbus import (
+    UnsupportedMeterError as CarloGavazziUnsupported,
+)
 from modbus_connection import ModbusError
-from victron_energy_meter import (
+from victron_energy_meter_modbus import (
     UnsupportedFirmwareError,
     UnsupportedMeterError as VictronUnsupported,
     VictronEnergyMeter,

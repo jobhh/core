@@ -3,7 +3,7 @@
 from typing import Any
 
 from modbus_connection import ModbusError
-from victron_energy_meter import VictronEnergyMeter
+from victron_energy_meter_modbus import VictronEnergyMeter
 
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant

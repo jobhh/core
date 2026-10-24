@@ -3,10 +3,12 @@
 from collections.abc import Mapping
 from typing import Any, override
 
-from carlo_gavazzi_modbus import UnsupportedMeterError as CarloGavazziUnsupported
+from carlo_gavazzi_energy_meter_modbus import (
+    UnsupportedMeterError as CarloGavazziUnsupported,
+)
 from modbus_connection import ModbusError
 import probatio
-from victron_energy_meter import (
+from victron_energy_meter_modbus import (
     UnsupportedFirmwareError,
     UnsupportedMeterError as VictronUnsupported,
 )

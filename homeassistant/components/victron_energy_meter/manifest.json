@@ -8,12 +8,15 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "loggers": [
-    "carlo_gavazzi_modbus",
+    "carlo_gavazzi_energy_meter_modbus",
     "modbus_connection",
     "tmodbus",
-    "victron_energy_meter"
+    "victron_energy_meter_modbus"
   ],
   "quality_scale": "bronze",
-  "requirements": ["carlo-gavazzi-modbus==0.1.0", "victron-energy-meter==0.1.0"],
+  "requirements": [
+    "carlo-gavazzi-energy-meter-modbus==0.1.0",
+    "victron-energy-meter-modbus==0.1.0"
+  ],
   "zeroconf": ["_victron-energy-meter._udp.local."]
 }

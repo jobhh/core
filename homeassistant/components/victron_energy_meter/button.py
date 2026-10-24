@@ -4,9 +4,9 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any, override
 
-from carlo_gavazzi_modbus import EM500Meter, Meter as CarloGavazziMeter
+from carlo_gavazzi_energy_meter_modbus import EM500Meter, Meter as CarloGavazziMeter
 from modbus_connection import ModbusError
-from victron_energy_meter import VictronEnergyMeter
+from victron_energy_meter_modbus import VictronEnergyMeter
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory

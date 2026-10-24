@@ -3,13 +3,13 @@
 from collections.abc import Mapping
 from typing import Any
 
-from carlo_gavazzi_modbus import (
+from carlo_gavazzi_energy_meter_modbus import (
     Meter as CarloGavazziMeter,
     async_identify as async_identify_carlo_gavazzi,
     create_meter as create_carlo_gavazzi_meter,
 )
 from modbus_connection import ModbusSerialParams, ModbusUdpParams, ModbusUnit
-from victron_energy_meter import (
+from victron_energy_meter_modbus import (
     PORT as VICTRON_PORT,
     UNIT_ID as VICTRON_UNIT_ID,
     VictronEnergyMeter,

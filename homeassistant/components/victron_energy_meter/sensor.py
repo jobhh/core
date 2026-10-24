@@ -6,14 +6,14 @@ from enum import IntEnum
 from operator import attrgetter, methodcaller
 from typing import Any, override
 
-from carlo_gavazzi_modbus import (
+from carlo_gavazzi_energy_meter_modbus import (
     DeviceState,
     EM500Meter,
     Meter as CarloGavazziMeter,
     PhaseSequence as CarloGavazziPhaseSequence,
     Tariff,
 )
-from victron_energy_meter import (
+from victron_energy_meter_modbus import (
     PhaseRotationAlarm,
     PhaseSequence as VictronPhaseSequence,
     VictronEnergyMeter,

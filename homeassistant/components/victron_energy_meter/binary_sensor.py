@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from operator import attrgetter
 from typing import Any, override
 
-from victron_energy_meter import VictronEnergyMeter
+from victron_energy_meter_modbus import VictronEnergyMeter
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,

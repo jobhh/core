@@ -765,7 +765,7 @@ cached-ipaddress==1.1.2
 caldav==3.3.0a1
 
 # homeassistant.components.victron_energy_meter
-carlo-gavazzi-modbus==0.1.0
+carlo-gavazzi-energy-meter-modbus==0.1.0
 
 # homeassistant.components.chef_iq
 chefiq-ble==1.0.1
@@ -3392,7 +3392,7 @@ viaggiatreno_ha==0.2.4
 victron-ble-ha-parser==0.8.0
 
 # homeassistant.components.victron_energy_meter
-victron-energy-meter==0.1.0
+victron-energy-meter-modbus==0.1.0
 
 # homeassistant.components.victron_gx
 victron-mqtt==2026.9.5
