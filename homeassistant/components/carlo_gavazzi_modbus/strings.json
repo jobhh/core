@@ -10,29 +10,55 @@
       "unsupported_meter": "A device answers on that port, but it is not an EM530 or EM540."
     },
     "step": {
-      "reconfigure": {
+      "gateway": {
         "data": {
-          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::user::data::baudrate%]",
-          "device": "[%key:component::carlo_gavazzi_modbus::config::step::user::data::device%]"
+          "host": "[%key:common::config_flow::data::host%]",
+          "port": "[%key:common::config_flow::data::port%]"
         },
         "data_description": {
-          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::user::data_description::baudrate%]",
-          "device": "[%key:component::carlo_gavazzi_modbus::config::step::user::data_description::device%]"
+          "host": "The hostname or IP address of the RS485-to-TCP gateway.",
+          "port": "The port the gateway listens on."
+        },
+        "description": "Set up a Carlo Gavazzi EM530 or EM540 energy meter behind an RS485-to-TCP gateway in transparent (RTU) mode. Set the gateway's serial side to the meter's baud rate.",
+        "sections": {
+          "more_options": {
+            "data": {
+              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::serial::sections::more_options::data::unit_id%]"
+            },
+            "data_description": {
+              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::serial::sections::more_options::data_description::unit_id%]"
+            },
+            "name": "[%key:component::carlo_gavazzi_modbus::config::step::serial::sections::more_options::name%]"
+          }
+        }
+      },
+      "reconfigure": {
+        "data": {
+          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::serial::data::baudrate%]",
+          "device": "[%key:component::carlo_gavazzi_modbus::config::step::serial::data::device%]",
+          "host": "[%key:common::config_flow::data::host%]",
+          "port": "[%key:common::config_flow::data::port%]"
+        },
+        "data_description": {
+          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::serial::data_description::baudrate%]",
+          "device": "[%key:component::carlo_gavazzi_modbus::config::step::serial::data_description::device%]",
+          "host": "[%key:component::carlo_gavazzi_modbus::config::step::gateway::data_description::host%]",
+          "port": "[%key:component::carlo_gavazzi_modbus::config::step::gateway::data_description::port%]"
         },
         "description": "Update how this meter is reached. Change the baud rate here after changing it on the meter.",
         "sections": {
           "more_options": {
             "data": {
-              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::user::sections::more_options::data::unit_id%]"
+              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::serial::sections::more_options::data::unit_id%]"
             },
             "data_description": {
-              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::user::sections::more_options::data_description::unit_id%]"
+              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::serial::sections::more_options::data_description::unit_id%]"
             },
-            "name": "[%key:component::carlo_gavazzi_modbus::config::step::user::sections::more_options::name%]"
+            "name": "[%key:component::carlo_gavazzi_modbus::config::step::serial::sections::more_options::name%]"
           }
         }
       },
-      "user": {
+      "serial": {
         "data": {
           "baudrate": "Baud rate",
           "device": "Serial port"
@@ -41,7 +67,7 @@
           "baudrate": "The baud rate set on the meter, under rS485. The factory default is 9600.",
           "device": "The serial port the meter's RS485 bus is wired to. ESPHome serial proxies are listed here too."
         },
-        "description": "Set up a Carlo Gavazzi EM530 or EM540 energy meter wired over RS485.",
+        "description": "Set up a Carlo Gavazzi EM530 or EM540 energy meter wired to a serial port or an ESPHome serial proxy.",
         "sections": {
           "more_options": {
             "data": {
@@ -53,6 +79,13 @@
             "name": "More options"
           }
         }
+      },
+      "user": {
+        "menu_options": {
+          "gateway": "RS485-to-TCP gateway",
+          "serial": "Serial port or ESPHome serial proxy"
+        },
+        "title": "How is the meter's RS485 bus reached?"
       }
     }
   },

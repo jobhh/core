@@ -14,7 +14,7 @@ from homeassistant.config_entries import (
     ConfigFlow,
     ConfigFlowResult,
 )
-from homeassistant.const import CONF_DEVICE, CONF_TYPE
+from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
 from homeassistant.data_entry_flow import section
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
@@ -22,14 +22,17 @@ from homeassistant.helpers.selector import (
     NumberSelectorConfig,
     NumberSelectorMode,
     SerialPortSelector,
+    TextSelector,
 )
 
 from .const import (
     CONF_BAUDRATE,
     CONF_UNIT_ID,
     DEFAULT_BAUDRATE,
+    DEFAULT_PORT,
     DEFAULT_UNIT_ID,
     DOMAIN,
+    TYPE_GATEWAY,
     TYPE_SERIAL,
 )
 from .entity import meter_name
@@ -39,7 +42,25 @@ SECTION_MORE_OPTIONS = "more_options"
 
 # A meter on a bus of its own keeps the factory-default address, so that
 # setting is tucked away in a collapsed section.
-STEP_USER = probatio.Schema(
+MORE_OPTIONS = {
+    probatio.Required(SECTION_MORE_OPTIONS): section(
+        probatio.Schema(
+            {
+                probatio.Required(CONF_UNIT_ID, default=DEFAULT_UNIT_ID): probatio.All(
+                    NumberSelector(
+                        NumberSelectorConfig(
+                            min=1, max=247, step=1, mode=NumberSelectorMode.BOX
+                        )
+                    ),
+                    probatio.Coerce(int),
+                ),
+            }
+        ),
+        {"collapsed": True},
+    )
+}
+
+STEP_SERIAL = probatio.Schema(
     {
         probatio.Required(CONF_DEVICE): SerialPortSelector(),
         probatio.Required(CONF_BAUDRATE, default=DEFAULT_BAUDRATE): probatio.All(
@@ -48,39 +69,48 @@ STEP_USER = probatio.Schema(
             ),
             probatio.Coerce(int),
         ),
-        probatio.Required(SECTION_MORE_OPTIONS): section(
-            probatio.Schema(
-                {
-                    probatio.Required(
-                        CONF_UNIT_ID, default=DEFAULT_UNIT_ID
-                    ): probatio.All(
-                        NumberSelector(
-                            NumberSelectorConfig(
-                                min=1, max=247, step=1, mode=NumberSelectorMode.BOX
-                            )
-                        ),
-                        probatio.Coerce(int),
-                    ),
-                }
-            ),
-            {"collapsed": True},
-        ),
+        **MORE_OPTIONS,
     }
 )
 
+STEP_GATEWAY = probatio.Schema(
+    {
+        probatio.Required(CONF_HOST): TextSelector(),
+        probatio.Required(CONF_PORT, default=DEFAULT_PORT): probatio.All(
+            NumberSelector(
+                NumberSelectorConfig(
+                    min=1, max=65535, step=1, mode=NumberSelectorMode.BOX
+                )
+            ),
+            probatio.Coerce(int),
+        ),
+        **MORE_OPTIONS,
+    }
+)
 
-def _flatten(user_input: dict[str, Any]) -> dict[str, Any]:
+SCHEMAS = {TYPE_SERIAL: STEP_SERIAL, TYPE_GATEWAY: STEP_GATEWAY}
+
+
+def _flatten(connection_type: str, user_input: dict[str, Any]) -> dict[str, Any]:
     """Flatten the sectioned form input into config entry data."""
-    data = {CONF_TYPE: TYPE_SERIAL, **user_input}
+    data = {CONF_TYPE: connection_type, **user_input}
     data[CONF_UNIT_ID] = data.pop(SECTION_MORE_OPTIONS)[CONF_UNIT_ID]
+
+    if connection_type == TYPE_GATEWAY:
+        # One connection is shared per host and port, so spelling matters.
+        data[CONF_HOST] = data[CONF_HOST].lower()
+
     return data
 
 
 def _sectioned(data: Mapping[str, Any]) -> dict[str, Any]:
     """Shape config entry data back into the sectioned form input."""
     return {
-        CONF_DEVICE: data[CONF_DEVICE],
-        CONF_BAUDRATE: data[CONF_BAUDRATE],
+        **{
+            key: value
+            for key, value in data.items()
+            if key not in (CONF_TYPE, CONF_UNIT_ID)
+        },
         SECTION_MORE_OPTIONS: {CONF_UNIT_ID: data[CONF_UNIT_ID]},
     }
 
@@ -114,11 +144,31 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Ask for the serial port settings, then probe the meter on it."""
+        """Let the user pick how the meter's RS485 bus is reached."""
+        return self.async_show_menu(
+            step_id="user", menu_options=[TYPE_SERIAL, TYPE_GATEWAY]
+        )
+
+    async def async_step_serial(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle a meter on a serial port or an ESPHome serial proxy."""
+        return await self._async_step_link(TYPE_SERIAL, user_input)
+
+    async def async_step_gateway(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle a meter behind an RS485-to-TCP gateway in transparent mode."""
+        return await self._async_step_link(TYPE_GATEWAY, user_input)
+
+    async def _async_step_link(
+        self, connection_type: str, user_input: dict[str, Any] | None
+    ) -> ConfigFlowResult:
+        """Ask for the link settings, then probe the meter behind them."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            data = _flatten(user_input)
+            data = _flatten(connection_type, user_input)
             errors, meter = await self._async_validate(data)
             if meter is not None:
                 await self.async_set_unique_id(meter.serial_number)
@@ -126,8 +176,10 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=meter_name(meter), data=data)
 
         return self.async_show_form(
-            step_id="user",
-            data_schema=self.add_suggested_values_to_schema(STEP_USER, user_input),
+            step_id=connection_type,
+            data_schema=self.add_suggested_values_to_schema(
+                SCHEMAS[connection_type], user_input
+            ),
             errors=errors,
         )
 
@@ -141,9 +193,10 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
         """
         errors: dict[str, str] = {}
         entry = self._get_reconfigure_entry()
+        connection_type = entry.data[CONF_TYPE]
 
         if user_input is not None:
-            data = _flatten(user_input)
+            data = _flatten(connection_type, user_input)
 
             relinking = False
             if _needs_relink(entry, data):
@@ -169,7 +222,7 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="reconfigure",
             data_schema=self.add_suggested_values_to_schema(
-                STEP_USER, user_input or _sectioned(entry.data)
+                SCHEMAS[connection_type], user_input or _sectioned(entry.data)
             ),
             errors=errors,
         )

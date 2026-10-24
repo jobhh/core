@@ -18,9 +18,10 @@ from homeassistant.components.carlo_gavazzi_modbus.const import (
     CONF_BAUDRATE,
     CONF_UNIT_ID,
     DOMAIN,
+    TYPE_GATEWAY,
 )
-from homeassistant.config_entries import SOURCE_USER, ConfigEntryState
-from homeassistant.const import CONF_DEVICE
+from homeassistant.config_entries import SOURCE_USER, ConfigEntryState, ConfigFlowResult
+from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
@@ -41,6 +42,30 @@ USER_INPUT = {
     SECTION_MORE_OPTIONS: {CONF_UNIT_ID: UNIT_ID},
 }
 
+GATEWAY_INPUT = {
+    CONF_HOST: "Gateway.local",
+    CONF_PORT: 4196,
+    SECTION_MORE_OPTIONS: {CONF_UNIT_ID: UNIT_ID},
+}
+GATEWAY_DATA = {
+    CONF_TYPE: TYPE_GATEWAY,
+    CONF_HOST: "gateway.local",
+    CONF_PORT: 4196,
+    CONF_UNIT_ID: UNIT_ID,
+}
+
+
+async def _start_flow(hass: HomeAssistant, link: str = "serial") -> ConfigFlowResult:
+    """Start a user flow and pick how the meter is reached."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": SOURCE_USER}
+    )
+    assert result["type"] is FlowResultType.MENU
+    return await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": link}
+    )
+
+
 # An EM340, which speaks another register map.
 EM340_MODEL_CODE = 341
 
@@ -48,11 +73,9 @@ EM340_MODEL_CODE = 341
 @pytest.mark.usefixtures("mock_setup_entry")
 async def test_user_flow(hass: HomeAssistant) -> None:
     """Test setting up a meter on a serial port."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await _start_flow(hass)
     assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "user"
+    assert result["step_id"] == "serial"
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], USER_INPUT
@@ -103,9 +126,7 @@ async def test_user_flow_errors(
     read = mock_modbus_unit.read_input_registers
     break_unit(mock_modbus_unit)
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await _start_flow(hass)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], USER_INPUT
     )
@@ -134,9 +155,7 @@ async def test_user_flow_port_in_use(hass: HomeAssistant) -> None:
         raise HomeAssistantError("in use")
         yield  # pragma: no cover
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await _start_flow(hass)
     with patch(
         "homeassistant.components.carlo_gavazzi_modbus.config_flow.async_get_temporary_unit",
         in_use,
@@ -162,9 +181,7 @@ async def test_user_flow_already_configured(
     """Test a meter that is already set up is not added twice."""
     mock_config_entry.add_to_hass(hass)
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await _start_flow(hass)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], USER_INPUT
     )
@@ -363,3 +380,44 @@ async def test_reconfigure_flow_new_baudrate_while_retrying(
     assert result["reason"] == "reconfigure_successful"
     assert mock_config_entry.data[CONF_BAUDRATE] == 9600
     assert mock_config_entry.state is ConfigEntryState.LOADED
+
+
+@pytest.mark.usefixtures("mock_setup_entry")
+async def test_gateway_flow(hass: HomeAssistant) -> None:
+    """Test setting up a meter behind an RS485-to-TCP gateway."""
+    result = await _start_flow(hass, TYPE_GATEWAY)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == TYPE_GATEWAY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], GATEWAY_INPUT
+    )
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Carlo Gavazzi EM540"
+    # One connection is shared per host, so the host is stored lowercased.
+    assert result["data"] == GATEWAY_DATA
+    assert result["result"].unique_id == SERIAL_NUMBER
+
+
+async def test_reconfigure_flow_gateway(
+    hass: HomeAssistant, mock_setup_entry: AsyncMock
+) -> None:
+    """Test a meter behind a gateway can move to another gateway port."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Carlo Gavazzi EM540",
+        unique_id=SERIAL_NUMBER,
+        data=GATEWAY_DATA,
+    )
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {**GATEWAY_INPUT, CONF_PORT: 502}
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data == {**GATEWAY_DATA, CONF_PORT: 502}
