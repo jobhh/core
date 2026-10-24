@@ -1,7 +1,8 @@
 {
   "config": {
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+      "wrong_meter": "[%key:component::carlo_gavazzi_modbus::exceptions::wrong_meter::message%]"
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
@@ -9,6 +10,28 @@
       "unsupported_meter": "A device answers on that port, but it is not an EM530 or EM540."
     },
     "step": {
+      "reconfigure": {
+        "data": {
+          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::user::data::baudrate%]",
+          "device": "[%key:component::carlo_gavazzi_modbus::config::step::user::data::device%]"
+        },
+        "data_description": {
+          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::user::data_description::baudrate%]",
+          "device": "[%key:component::carlo_gavazzi_modbus::config::step::user::data_description::device%]"
+        },
+        "description": "Update how this meter is reached. Change the baud rate here after changing it on the meter.",
+        "sections": {
+          "more_options": {
+            "data": {
+              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::user::sections::more_options::data::unit_id%]"
+            },
+            "data_description": {
+              "unit_id": "[%key:component::carlo_gavazzi_modbus::config::step::user::sections::more_options::data_description::unit_id%]"
+            },
+            "name": "[%key:component::carlo_gavazzi_modbus::config::step::user::sections::more_options::name%]"
+          }
+        }
+      },
       "user": {
         "data": {
           "baudrate": "Baud rate",
