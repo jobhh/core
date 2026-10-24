@@ -53,7 +53,7 @@ rules:
 
   # Gold
   devices: done
-  diagnostics: todo
+  diagnostics: done
   discovery:
     status: exempt
     comment: A meter on an RS485 bus does not announce itself.
