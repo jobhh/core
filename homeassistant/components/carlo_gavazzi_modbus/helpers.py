@@ -3,7 +3,8 @@
 from collections.abc import Mapping
 from typing import Any
 
-from modbus_connection import ModbusSerialParams
+from carlo_gavazzi_energy_meter_modbus import Meter, async_identify, create_meter
+from modbus_connection import ModbusSerialParams, ModbusUnit
 
 from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
 
@@ -26,3 +27,13 @@ def create_modbus_params(data: Mapping[str, Any]) -> ModbusSerialParams:
             device=f"socket://{host}:{data[CONF_PORT]}", framer="rtu"
         )
     return ModbusSerialParams(device=data[CONF_DEVICE], baudrate=data[CONF_BAUDRATE])
+
+
+async def async_setup_meter(unit: ModbusUnit) -> Meter:
+    """Identify the meter on ``unit`` and return it, set up.
+
+    The model code alone tells the series, and with it the register map.
+    """
+    meter = create_meter(unit, await async_identify(unit))
+    await meter.async_ensure_setup()
+    return meter

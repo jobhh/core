@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 from typing import Any, override
 
-from carlo_gavazzi_energy_meter_modbus import EM500Meter, UnsupportedMeterError
+from carlo_gavazzi_energy_meter_modbus import Meter, UnsupportedMeterError
 from modbus_connection import ModbusError
 import probatio
 
@@ -36,7 +36,7 @@ from .const import (
     TYPE_SERIAL,
 )
 from .entity import meter_name
-from .helpers import create_modbus_params
+from .helpers import async_setup_meter, create_modbus_params
 
 SECTION_MORE_OPTIONS = "more_options"
 
@@ -229,14 +229,13 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
 
     async def _async_validate(
         self, data: dict[str, Any]
-    ) -> tuple[dict[str, str], EM500Meter | None]:
+    ) -> tuple[dict[str, str], Meter | None]:
         """Probe the meter, returning form errors and the set-up meter."""
         try:
             async with async_get_temporary_unit(
                 self.hass, create_modbus_params(data), data[CONF_UNIT_ID]
             ) as unit:
-                meter = EM500Meter(unit)
-                await meter.async_ensure_setup()
+                meter = await async_setup_meter(unit)
         except HomeAssistantError, ModbusError:
             # HomeAssistantError: the port is already in use at other line
             # settings, which one connection cannot honour.

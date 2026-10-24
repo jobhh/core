@@ -6,7 +6,7 @@ stores as the config entry unique ID.
 
 from typing import TYPE_CHECKING, override
 
-from carlo_gavazzi_energy_meter_modbus import EM500Meter
+from carlo_gavazzi_energy_meter_modbus import Meter
 
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityDescription
@@ -19,14 +19,14 @@ from .coordinator import (
 )
 
 
-def meter_name(meter: EM500Meter) -> str:
+def meter_name(meter: Meter) -> str:
     """Return a name for a set-up meter, such as "Carlo Gavazzi EM540"."""
     if TYPE_CHECKING:
         assert meter.model is not None
     return f"Carlo Gavazzi {meter.model.family}"
 
 
-def meter_device_info(meter: EM500Meter, serial_number: str) -> DeviceInfo:
+def meter_device_info(meter: Meter, serial_number: str) -> DeviceInfo:
     """Return device information for a set-up meter."""
     model = meter.model
     if TYPE_CHECKING:

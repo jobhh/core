@@ -17,6 +17,7 @@ from homeassistant.helpers import entity_registry as er
 RESET_PARTIAL_COUNTERS = "button.carlo_gavazzi_em540_reset_partial_counters"
 
 
+@pytest.mark.parametrize("meter_fixture", ["em540.json", "et340.json"])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_buttons(
     hass: HomeAssistant,
@@ -24,7 +25,7 @@ async def test_buttons(
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
 ) -> None:
-    """Test every button the EM540 offers."""
+    """Test every button each meter offers."""
     with patch(
         "homeassistant.components.carlo_gavazzi_modbus.PLATFORMS", [Platform.BUTTON]
     ):

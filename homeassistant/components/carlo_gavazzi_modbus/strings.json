@@ -7,7 +7,7 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "no_serial_number": "The meter did not report a serial number, which is needed to identify it.",
-      "unsupported_meter": "A device answers on that port, but it is not an EM530 or EM540."
+      "unsupported_meter": "A device answers there, but it is not a supported Carlo Gavazzi energy meter."
     },
     "step": {
       "gateway": {
@@ -19,7 +19,7 @@
           "host": "The hostname or IP address of the RS485-to-TCP gateway.",
           "port": "The port the gateway listens on."
         },
-        "description": "Set up a Carlo Gavazzi EM530 or EM540 energy meter behind an RS485-to-TCP gateway in transparent (RTU) mode. Set the gateway's serial side to the meter's baud rate.",
+        "description": "Set up a Carlo Gavazzi energy meter, such as an EM540 or ET340, behind an RS485-to-TCP gateway in transparent (RTU) mode. Set the gateway's serial side to the meter's baud rate.",
         "sections": {
           "more_options": {
             "data": {
@@ -67,7 +67,7 @@
           "baudrate": "The baud rate set on the meter, under rS485. The factory default is 9600.",
           "device": "The serial port the meter's RS485 bus is wired to. ESPHome serial proxies are listed here too."
         },
-        "description": "Set up a Carlo Gavazzi EM530 or EM540 energy meter wired to a serial port or an ESPHome serial proxy.",
+        "description": "Set up a Carlo Gavazzi energy meter, such as an EM540 or ET340, wired to a serial port or an ESPHome serial proxy.",
         "sections": {
           "more_options": {
             "data": {
@@ -155,6 +155,9 @@
       },
       "energy_exported_partial": {
         "name": "Energy exported (partial)"
+      },
+      "energy_exported_phase": {
+        "name": "Energy exported {phase}"
       },
       "energy_imported": {
         "name": "Energy imported"

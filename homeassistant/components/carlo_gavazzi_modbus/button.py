@@ -2,9 +2,9 @@
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import override
+from typing import Any, override
 
-from carlo_gavazzi_energy_meter_modbus import EM500Meter
+from carlo_gavazzi_energy_meter_modbus import EM500Meter, Meter
 from modbus_connection import ModbusError
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
@@ -25,7 +25,8 @@ class CarloGavazziModbusButtonEntityDescription(ButtonEntityDescription):
     """Describes a Carlo Gavazzi Modbus button entity."""
 
     subsystem: str
-    press_fn: Callable[[EM500Meter], Awaitable[None]]
+    press_fn: Callable[[Any], Awaitable[None]]
+    supported_fn: Callable[[Meter], bool] = lambda _: True
 
 
 # Resetting the lifetime counters is left out on purpose: it would break the
@@ -45,6 +46,7 @@ BUTTONS: tuple[CarloGavazziModbusButtonEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
         press_fn=lambda meter: meter.async_reset_demand(),
+        supported_fn=lambda meter: isinstance(meter, EM500Meter),
     ),
     CarloGavazziModbusButtonEntityDescription(
         key="reset_tariff_counters",
@@ -53,6 +55,7 @@ BUTTONS: tuple[CarloGavazziModbusButtonEntityDescription, ...] = (
         entity_category=EntityCategory.CONFIG,
         entity_registry_enabled_default=False,
         press_fn=lambda meter: meter.async_reset_tariff_counters(),
+        supported_fn=lambda meter: isinstance(meter, EM500Meter),
     ),
 )
 
@@ -66,6 +69,7 @@ async def async_setup_entry(
     async_add_entities(
         CarloGavazziModbusButtonEntity(entry=entry, description=description)
         for description in BUTTONS
+        if description.supported_fn(entry.runtime_data.coordinator.meter)
     )
 
 

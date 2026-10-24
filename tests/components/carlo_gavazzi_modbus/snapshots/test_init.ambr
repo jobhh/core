@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_setup_and_unload
+# name: test_setup_and_unload[em540.json]
   DeviceRegistryEntrySnapshot({
     'area_id': None,
     'config_entry_id': <ANY>,
@@ -26,6 +26,36 @@
     'name_by_user': None,
     'serial_number': 'XX0000000000X',
     'sw_version': '1.4.3',
+    'via_device_id': None,
+  })
+# ---
+# name: test_setup_and_unload[et340.json]
+  DeviceRegistryEntrySnapshot({
+    'area_id': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'configuration_url': None,
+    'connections': set({
+    }),
+    'disabled_by': None,
+    'entry_type': None,
+    'hw_version': None,
+    'id': <ANY>,
+    'identifiers': set({
+      tuple(
+        'carlo_gavazzi_modbus',
+        'KX12345',
+      ),
+    }),
+    'labels': set({
+    }),
+    'manufacturer': 'Carlo Gavazzi',
+    'model': 'ET340',
+    'model_id': 'ET340DINAV23',
+    'name': 'Carlo Gavazzi ET340',
+    'name_by_user': None,
+    'serial_number': 'KX12345',
+    'sw_version': 'B2',
     'via_device_id': None,
   })
 # ---

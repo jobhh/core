@@ -19,8 +19,15 @@ from homeassistant.components.carlo_gavazzi_modbus.const import (
 from homeassistant.const import CONF_DEVICE, CONF_TYPE
 from homeassistant.core import HomeAssistant
 
-# What the capture holds in place of the meter's serial number.
+# What the EM540 capture holds in place of the meter's serial number.
 SERIAL_NUMBER = "XX0000000000X"
+
+# The meters the tests can run against: an EM540 captured from a real meter,
+# and an ET340 of the EM300 series, from hand-picked registers.
+METERS = {
+    "em540.json": (SERIAL_NUMBER, "Carlo Gavazzi EM540"),
+    "et340.json": ("KX12345", "Carlo Gavazzi ET340"),
+}
 SERIAL_REGISTERS = range(0x5000, 0x5007)
 
 DEVICE = "/dev/ttyUSB0"
@@ -39,15 +46,19 @@ MODEL_CODE_REGISTER = 0x000B
 
 
 async def async_seed_unit(
-    hass: HomeAssistant, unit: MockModbusUnit, *, model_code: int | None = None
+    hass: HomeAssistant,
+    unit: MockModbusUnit,
+    *,
+    meter: str = "em540.json",
+    model_code: int | None = None,
 ) -> None:
-    """Seed a mock unit with the register dump of an EM540 on firmware 1.4.3.
+    """Seed a mock unit with a meter's registers, by default an EM540.
 
     The capture merges every read by address, so 0x000B holds the L3-L1
     voltage's high word; the meter answers its model code there only to a read
     of that register alone. Pass ``model_code`` to answer as another model.
     """
-    fixture = await async_load_json_object_fixture(hass, "em540.json", DOMAIN)
+    fixture = await async_load_json_object_fixture(hass, meter, DOMAIN)
     for space, registers in fixture["raw"].items():
         unit.load_raw({space: {int(a, 16): v for a, v in registers.items()}})
     # Functions 03h and 04h read the same data on this meter.
@@ -76,16 +87,24 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 
 
 @pytest.fixture
-async def mock_modbus_unit(
-    hass: HomeAssistant, mock_modbus_connection: MockModbusConnection
-) -> MockModbusUnit:
-    """A seeded EM540 on unit ``UNIT_ID``.
+def meter_fixture() -> str:
+    """Return which of ``METERS`` answers on the mock link."""
+    return "em540.json"
 
-    Overrides the library plugin's ``mock_modbus_unit`` to preload a register
-    dump captured from a real meter.
+
+@pytest.fixture
+async def mock_modbus_unit(
+    hass: HomeAssistant,
+    mock_modbus_connection: MockModbusConnection,
+    meter_fixture: str,
+) -> MockModbusUnit:
+    """A seeded meter on unit ``UNIT_ID``.
+
+    Overrides the library plugin's ``mock_modbus_unit`` to preload the
+    meter's registers.
     """
     unit = mock_modbus_connection.for_unit(UNIT_ID)
-    await async_seed_unit(hass, unit)
+    await async_seed_unit(hass, unit, meter=meter_fixture)
     return unit
 
 
@@ -117,12 +136,13 @@ def mock_shared_connection(
 
 
 @pytest.fixture
-def mock_config_entry() -> MockConfigEntry:
+def mock_config_entry(meter_fixture: str) -> MockConfigEntry:
     """A Carlo Gavazzi Modbus config entry for the seeded meter."""
+    serial_number, title = METERS[meter_fixture]
     return MockConfigEntry(
         domain=DOMAIN,
-        title="Carlo Gavazzi EM540",
-        unique_id=SERIAL_NUMBER,
+        title=title,
+        unique_id=serial_number,
         data=ENTRY_DATA,
     )
 

@@ -23,6 +23,7 @@ WIRING_ERROR = "binary_sensor.carlo_gavazzi_em540_wiring_error"
 WRONG_CONNECTION_REGISTER = 0x1105
 
 
+@pytest.mark.parametrize("meter_fixture", ["em540.json", "et340.json"])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_binary_sensors(
     hass: HomeAssistant,
@@ -30,7 +31,7 @@ async def test_binary_sensors(
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
 ) -> None:
-    """Test every binary sensor the captured EM540 serves."""
+    """Test every binary sensor each meter serves."""
     with patch(
         "homeassistant.components.carlo_gavazzi_modbus.PLATFORMS",
         [Platform.BINARY_SENSOR],

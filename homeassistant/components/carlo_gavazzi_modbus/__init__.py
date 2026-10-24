@@ -8,7 +8,7 @@ that unit to the ``carlo-gavazzi-energy-meter-modbus`` library.
 
 from typing import TYPE_CHECKING
 
-from carlo_gavazzi_energy_meter_modbus import EM500Meter, UnsupportedMeterError
+from carlo_gavazzi_energy_meter_modbus import UnsupportedMeterError
 from modbus_connection import ModbusError
 
 from homeassistant.components.modbus import async_get_unit
@@ -27,7 +27,7 @@ from .coordinator import (
     CarloGavazziModbusRuntimeData,
 )
 from .entity import meter_device_info
-from .helpers import create_modbus_params
+from .helpers import async_setup_meter, create_modbus_params
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
@@ -53,9 +53,8 @@ async def async_setup_entry(
             translation_placeholders={"error": str(err)},
         ) from err
 
-    meter = EM500Meter(unit)
     try:
-        await meter.async_ensure_setup()
+        meter = await async_setup_meter(unit)
     except ModbusError as err:
         raise ConfigEntryNotReady(
             translation_domain=DOMAIN,

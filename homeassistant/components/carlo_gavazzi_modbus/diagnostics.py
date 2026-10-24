@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from carlo_gavazzi_energy_meter_modbus.em500 import ALL
+from carlo_gavazzi_energy_meter_modbus import EM500Meter, em300, em500
 from modbus_connection import ModbusError
 from modbus_connection.model import Component, RegisterField
 
@@ -17,8 +17,13 @@ TO_REDACT = {"serial_number"}
 SERIAL_REGISTERS = range(0x5000, 0x5007)
 
 
-def _component_data(component: Component) -> dict[str, Any]:
-    """Every decoded register field and computed property of a component."""
+def _component_data(component: Component | None) -> dict[str, Any] | None:
+    """Every decoded register field and computed property of a component.
+
+    ``None`` for a block this meter does not serve.
+    """
+    if component is None:
+        return None
     names = {
         name
         for klass in type(component).__mro__
@@ -40,6 +45,7 @@ async def async_get_config_entry_diagnostics(
     """
     coordinator = entry.runtime_data.coordinator
     meter = coordinator.meter
+    names = em500.ALL if isinstance(meter, EM500Meter) else em300.ALL
 
     raw: dict[str, dict[int, int | bool]] | None = None
     raw_error: str | None = None
@@ -53,7 +59,7 @@ async def async_get_config_entry_diagnostics(
                 registers.pop(address, None)
 
     data: dict[str, Any] = {
-        "wide_reads": meter.wide_reads,
+        "wide_reads": meter.wide_reads if isinstance(meter, EM500Meter) else None,
         "poll": {
             "updated": sorted(coordinator.data.updated),
             "failed": {
@@ -61,7 +67,7 @@ async def async_get_config_entry_diagnostics(
                 for subsystem, error in coordinator.data.failed.items()
             },
         },
-        **{name: _component_data(getattr(meter, name)) for name in ALL},
+        **{name: _component_data(getattr(meter, name)) for name in names},
         "raw": raw,
         "raw_error": raw_error,
     }

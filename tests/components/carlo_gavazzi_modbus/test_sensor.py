@@ -27,6 +27,7 @@ ENERGY_REGISTER = 0x0500
 MEASUREMENTS_REGISTER = 0x0000
 
 
+@pytest.mark.parametrize("meter_fixture", ["em540.json", "et340.json"])
 @pytest.mark.usefixtures("entity_registry_enabled_by_default")
 async def test_sensors(
     hass: HomeAssistant,
@@ -34,7 +35,7 @@ async def test_sensors(
     snapshot: SnapshotAssertion,
     mock_config_entry: MockConfigEntry,
 ) -> None:
-    """Test every sensor the captured EM540 serves."""
+    """Test every sensor each meter serves."""
     with patch(
         "homeassistant.components.carlo_gavazzi_modbus.PLATFORMS", [Platform.SENSOR]
     ):

@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from modbus_connection import ModbusTimeoutError
 from modbus_connection.mock import MockModbusUnit
+import pytest
 from pytest_homeassistant.common import MockConfigEntry
 from syrupy.assertion import SnapshotAssertion
 
@@ -13,12 +14,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 
-from .conftest import ENTRY_DATA, SERIAL_NUMBER, async_seed_unit
+from .conftest import ENTRY_DATA, async_seed_unit
 
-# An EM340, which speaks another register map.
-EM340_MODEL_CODE = 341
+# A model code no Carlo Gavazzi meter this integration supports reports.
+UNKNOWN_MODEL_CODE = 9999
 
 
+@pytest.mark.parametrize("meter_fixture", ["em540.json", "et340.json"])
 async def test_setup_and_unload(
     hass: HomeAssistant,
     init_integration: MockConfigEntry,
@@ -28,7 +30,7 @@ async def test_setup_and_unload(
     """Test the meter sets up as a device, and unloads."""
     assert init_integration.state is ConfigEntryState.LOADED
     device = device_registry.async_get_device_by_identifier(
-        (DOMAIN, SERIAL_NUMBER), init_integration.entry_id
+        (DOMAIN, init_integration.unique_id), init_integration.entry_id
     )
     assert device == snapshot
 
@@ -54,8 +56,8 @@ async def test_unsupported_meter_fails_setup(
     mock_config_entry: MockConfigEntry,
     mock_modbus_unit: MockModbusUnit,
 ) -> None:
-    """Test setup fails for good when the device is no EM530 or EM540."""
-    await async_seed_unit(hass, mock_modbus_unit, model_code=EM340_MODEL_CODE)
+    """Test setup fails for good when the device is no supported meter."""
+    await async_seed_unit(hass, mock_modbus_unit, model_code=UNKNOWN_MODEL_CODE)
     mock_config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
 

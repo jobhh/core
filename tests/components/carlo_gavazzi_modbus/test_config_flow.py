@@ -66,8 +66,8 @@ async def _start_flow(hass: HomeAssistant, link: str = "serial") -> ConfigFlowRe
     )
 
 
-# An EM340, which speaks another register map.
-EM340_MODEL_CODE = 341
+# A model code no Carlo Gavazzi meter this integration supports reports.
+UNKNOWN_MODEL_CODE = 9999
 
 
 @pytest.mark.usefixtures("mock_setup_entry")
@@ -96,7 +96,7 @@ def _other_model(unit: MockModbusUnit) -> None:
 
     async def read_input_registers(address: int, count: int) -> list[int]:
         if address == 0x000B and count == 1:
-            return [EM340_MODEL_CODE]
+            return [UNKNOWN_MODEL_CODE]
         return await read(address, count)
 
     unit.read_input_registers = read_input_registers  # type: ignore[method-assign]

@@ -3,12 +3,12 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import IntEnum
-from operator import attrgetter
 from typing import override
 
 from carlo_gavazzi_energy_meter_modbus import (
     DeviceState,
     EM500Meter,
+    Meter,
     PhaseSequence,
     Tariff,
 )
@@ -42,6 +42,46 @@ from .entity import CarloGavazziModbusEntity
 PARALLEL_UPDATES = 0
 
 PHASES = (1, 2, 3)
+
+# Where a value comes from where the two series keep it in different blocks.
+SOURCE_TOTALS = "totals"
+"""The energy totals, from the finest counters the meter serves."""
+SOURCE_DETAIL = "detail"
+"""The partial and per-phase energy counters."""
+SOURCE_RUN_HOURS = "run_hours"
+
+
+def _resolve(meter: Meter, subsystem: str) -> str:
+    """Return the sub-system a value is read from on this meter."""
+    if isinstance(meter, EM500Meter):
+        if subsystem in (SOURCE_TOTALS, SOURCE_DETAIL, SOURCE_RUN_HOURS):
+            return "energy"
+        return subsystem
+    if subsystem == SOURCE_TOTALS:
+        best = meter.best_energy()
+        return next(
+            name
+            for name in ("energy_wh", "energy_precise", "energy")
+            if getattr(meter, name) is best
+        )
+    if subsystem == SOURCE_DETAIL:
+        return "energy" if meter.energy_wh is None else "energy_wh"
+    return subsystem
+
+
+def _serves(meter: Meter, subsystem: str, field: str) -> bool:
+    """Return whether the meter reads ``field`` of a sub-system.
+
+    The EM300 series lacks some of the EM500 series' fields, serves some blocks
+    only on certain models, and some fields only on certain models.
+    """
+    if (component := getattr(meter, subsystem, None)) is None:
+        return False
+    if field in component.declared_fields:
+        return field in component.resolved_fields
+    return isinstance(getattr(type(component), field, None), property)
+
+
 LINES = {1: "L1-L2", 2: "L2-L3", 3: "L3-L1"}
 
 
@@ -50,21 +90,23 @@ class CarloGavazziModbusSensorEntityDescription(SensorEntityDescription):
     """Describes a Carlo Gavazzi Modbus sensor entity."""
 
     subsystem: str
-    exists_fn: Callable[[EM500Meter], bool] = lambda _: True
-    value_fn: Callable[[EM500Meter], StateType | IntEnum]
+    """The sub-system the value comes from, or one of the ``SOURCE_`` names."""
+
+    field: str
+    exists_fn: Callable[[Meter], bool] = lambda _: True
 
 
-def _has_phase(phase: int) -> Callable[[EM500Meter], bool]:
+def _has_phase(phase: int) -> Callable[[Meter], bool]:
     """Return whether the meter measures a phase: a 2P system has no L3."""
     return lambda meter: phase < 3 or meter.phases != 2
 
 
-def _has_neutral_phase(phase: int) -> Callable[[EM500Meter], bool]:
+def _has_neutral_phase(phase: int) -> Callable[[Meter], bool]:
     """Return whether the meter measures a phase against a neutral."""
     return lambda meter: _has_phase(phase)(meter) and meter.has_neutral is not False
 
 
-def _measures_export(meter: EM500Meter) -> bool:
+def _measures_export(meter: Meter) -> bool:
     """Return whether the exported energy counters move.
 
     In measurement mode A everything counts as imported.
@@ -78,7 +120,7 @@ def _enum(
     subsystem: str,
     field: str,
     options: type[IntEnum],
-    exists_fn: Callable[[EM500Meter], bool] = lambda _: True,
+    exists_fn: Callable[[Meter], bool] = lambda _: True,
 ) -> CarloGavazziModbusSensorEntityDescription:
     """Describe a diagnostic sensor reporting one of an enum's members."""
     return CarloGavazziModbusSensorEntityDescription(
@@ -90,7 +132,7 @@ def _enum(
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         exists_fn=exists_fn,
-        value_fn=attrgetter(f"{subsystem}.{field}"),
+        field=field,
     )
 
 
@@ -106,12 +148,12 @@ def _per_phase(
     state_class: SensorStateClass = SensorStateClass.MEASUREMENT,
     enabled: bool = True,
     neutral: bool = False,
-    exists_fn: Callable[[EM500Meter], bool] = lambda _: True,
+    exists_fn: Callable[[Meter], bool] = lambda _: True,
 ) -> tuple[CarloGavazziModbusSensorEntityDescription, ...]:
     """Describe one sensor per phase; ``{n}`` in key and field is the phase."""
     has_phase = _has_neutral_phase if neutral else _has_phase
 
-    def exists(phase: int) -> Callable[[EM500Meter], bool]:
+    def exists(phase: int) -> Callable[[Meter], bool]:
         return lambda meter: has_phase(phase)(meter) and exists_fn(meter)
 
     return tuple(
@@ -126,7 +168,7 @@ def _per_phase(
             suggested_display_precision=precision,
             entity_registry_enabled_default=enabled,
             exists_fn=exists(phase),
-            value_fn=attrgetter(f"{subsystem}.{field.format(n=phase)}"),
+            field=field.format(n=phase),
         )
         for phase in PHASES
     )
@@ -140,7 +182,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfPower.WATT,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
-        value_fn=attrgetter("measurements.active_power"),
+        field="active_power",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="apparent_power",
@@ -150,7 +192,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
         entity_registry_enabled_default=False,
-        value_fn=attrgetter("measurements.apparent_power"),
+        field="apparent_power",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="reactive_power",
@@ -160,7 +202,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
         entity_registry_enabled_default=False,
-        value_fn=attrgetter("measurements.reactive_power"),
+        field="reactive_power",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="power_factor",
@@ -168,7 +210,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=3,
-        value_fn=attrgetter("measurements.power_factor"),
+        field="power_factor",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="frequency",
@@ -177,7 +219,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfFrequency.HERTZ,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
-        value_fn=attrgetter("measurements.frequency"),
+        field="frequency",
     ),
     *_per_phase(
         key="voltage_l{n}",
@@ -201,9 +243,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
             suggested_display_precision=1,
             entity_registry_enabled_default=False,
             exists_fn=_has_phase(phase),
-            value_fn=attrgetter(
-                f"measurements.voltage_{line.lower().replace('-', '_')}"
-            ),
+            field=f"voltage_{line.lower().replace('-', '_')}",
         )
         for phase, line in LINES.items()
     ),
@@ -256,7 +296,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
             suggested_display_precision=3,
             entity_registry_enabled_default=False,
             exists_fn=_has_phase(phase),
-            value_fn=attrgetter(f"measurements.power_factor_l{phase}"),
+            field=f"power_factor_l{phase}",
         )
         for phase in PHASES
     ),
@@ -271,50 +311,50 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
     CarloGavazziModbusSensorEntityDescription(
         key="energy_imported",
         translation_key="energy_imported",
-        subsystem="energy",
+        subsystem=SOURCE_TOTALS,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
-        value_fn=attrgetter("energy.energy_imported"),
+        field="energy_imported",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="energy_exported",
         translation_key="energy_exported",
-        subsystem="energy",
+        subsystem=SOURCE_TOTALS,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
         exists_fn=_measures_export,
-        value_fn=attrgetter("energy.energy_exported"),
+        field="energy_exported",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="energy_imported_partial",
         translation_key="energy_imported_partial",
-        subsystem="energy",
+        subsystem=SOURCE_DETAIL,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
         entity_registry_enabled_default=False,
-        value_fn=attrgetter("energy.energy_imported_partial"),
+        field="energy_imported_partial",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="energy_exported_partial",
         translation_key="energy_exported_partial",
-        subsystem="energy",
+        subsystem=SOURCE_DETAIL,
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
         entity_registry_enabled_default=False,
         exists_fn=_measures_export,
-        value_fn=attrgetter("energy.energy_exported_partial"),
+        field="energy_exported_partial",
     ),
     *_per_phase(
         key="energy_imported_l{n}",
-        subsystem="energy",
+        subsystem=SOURCE_DETAIL,
         field="energy_imported_l{n}",
         translation_key="energy_imported_phase",
         device_class=SensorDeviceClass.ENERGY,
@@ -323,28 +363,40 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         enabled=False,
     ),
+    *_per_phase(
+        key="energy_exported_l{n}",
+        subsystem="exported_per_phase",
+        field="energy_exported_l{n}",
+        translation_key="energy_exported_phase",
+        device_class=SensorDeviceClass.ENERGY,
+        unit=UnitOfEnergy.KILO_WATT_HOUR,
+        precision=2,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        enabled=False,
+        exists_fn=_measures_export,
+    ),
     CarloGavazziModbusSensorEntityDescription(
         key="reactive_energy_imported",
         translation_key="reactive_energy_imported",
-        subsystem="energy",
+        subsystem=SOURCE_TOTALS,
         device_class=SensorDeviceClass.REACTIVE_ENERGY,
         native_unit_of_measurement=UnitOfReactiveEnergy.KILO_VOLT_AMPERE_REACTIVE_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
         entity_registry_enabled_default=False,
-        value_fn=attrgetter("energy.reactive_energy_imported"),
+        field="reactive_energy_imported",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="reactive_energy_exported",
         translation_key="reactive_energy_exported",
-        subsystem="energy",
+        subsystem=SOURCE_TOTALS,
         device_class=SensorDeviceClass.REACTIVE_ENERGY,
         native_unit_of_measurement=UnitOfReactiveEnergy.KILO_VOLT_AMPERE_REACTIVE_HOUR,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
         entity_registry_enabled_default=False,
         exists_fn=_measures_export,
-        value_fn=attrgetter("energy.reactive_energy_exported"),
+        field="reactive_energy_exported",
     ),
     *(
         CarloGavazziModbusSensorEntityDescription(
@@ -357,21 +409,21 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
             state_class=SensorStateClass.TOTAL_INCREASING,
             suggested_display_precision=2,
             entity_registry_enabled_default=False,
-            value_fn=attrgetter(f"tariff_energy.energy_imported_tariff_{tariff}"),
+            field=f"energy_imported_tariff_{tariff}",
         )
         for tariff in (1, 2)
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="run_hours",
         translation_key="run_hours",
-        subsystem="energy",
+        subsystem=SOURCE_RUN_HOURS,
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.HOURS,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=2,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        value_fn=attrgetter("energy.run_hours"),
+        field="run_hours",
     ),
     CarloGavazziModbusSensorEntityDescription(
         key="run_hours_lifetime",
@@ -383,7 +435,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         suggested_display_precision=2,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        value_fn=attrgetter("energy.run_hours_lifetime"),
+        field="run_hours_lifetime",
     ),
     *(
         CarloGavazziModbusSensorEntityDescription(
@@ -395,7 +447,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
             state_class=SensorStateClass.MEASUREMENT,
             suggested_display_precision=0,
             entity_registry_enabled_default=False,
-            value_fn=attrgetter(f"demand.{key}"),
+            field=f"{key}",
         )
         for key, device_class, unit in (
             ("active_power_demand", SensorDeviceClass.POWER, UnitOfPower.WATT),
@@ -422,7 +474,7 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         suggested_display_precision=2,
         entity_registry_enabled_default=False,
         exists_fn=lambda meter: meter.has_neutral is not False,
-        value_fn=attrgetter("power_quality.neutral_current"),
+        field="neutral_current",
     ),
     *_per_phase(
         key="thd_current_l{n}",
@@ -468,9 +520,16 @@ async def async_setup_entry(
     """Set up the sensors for what the meter measures, as it is wired."""
     meter = entry.runtime_data.coordinator.meter
     async_add_entities(
-        CarloGavazziModbusSensorEntity(entry=entry, description=description)
+        CarloGavazziModbusSensorEntity(
+            entry=entry, subsystem=subsystem, description=description
+        )
         for description in SENSORS
-        if description.exists_fn(meter)
+        if _serves(
+            meter,
+            subsystem := _resolve(meter, description.subsystem),
+            description.field,
+        )
+        and description.exists_fn(meter)
     )
 
 
@@ -479,22 +538,12 @@ class CarloGavazziModbusSensorEntity(CarloGavazziModbusEntity, SensorEntity):
 
     entity_description: CarloGavazziModbusSensorEntityDescription
 
-    def __init__(
-        self,
-        *,
-        entry: CarloGavazziModbusConfigEntry,
-        description: CarloGavazziModbusSensorEntityDescription,
-    ) -> None:
-        """Initialize the sensor."""
-        super().__init__(
-            entry=entry, subsystem=description.subsystem, description=description
-        )
-
     @property
     @override
     def native_value(self) -> StateType:
         """Return the value the meter reported on the last poll."""
-        value = self.entity_description.value_fn(self.coordinator.meter)
+        component = getattr(self.coordinator.meter, self._subsystem)
+        value: StateType | IntEnum = getattr(component, self.entity_description.field)
         if isinstance(value, IntEnum):
             return value.name.lower()
         return value

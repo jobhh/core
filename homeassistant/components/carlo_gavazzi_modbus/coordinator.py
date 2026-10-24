@@ -4,8 +4,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import override
 
-from carlo_gavazzi_energy_meter_modbus import EM500Meter, UpdateReport
-from carlo_gavazzi_energy_meter_modbus.em500 import READINGS
+from carlo_gavazzi_energy_meter_modbus import Meter, UpdateReport
 from modbus_connection import ModbusError
 
 from homeassistant.config_entries import ConfigEntry
@@ -31,7 +30,7 @@ def _merge(first: UpdateReport, retry: UpdateReport) -> UpdateReport:
 
 
 class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport]):
-    """Polls what an EM530 or EM540 measures.
+    """Polls what a Carlo Gavazzi meter measures.
 
     A poll can come back partial: the library reads every sub-system on its
     own, and the report names what refreshed, which is what entities read
@@ -44,7 +43,7 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
         self,
         hass: HomeAssistant,
         entry: CarloGavazziModbusConfigEntry,
-        meter: EM500Meter,
+        meter: Meter,
     ) -> None:
         """Initialize the coordinator."""
         self.meter = meter
@@ -61,7 +60,7 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
     async def _async_update_data(self) -> UpdateReport:
         """Poll the meter, reporting what answered."""
         try:
-            report = await self.meter.async_poll(READINGS)
+            report = await self.meter.async_update_readings()
         except ModbusError as err:
             raise UpdateFailed(
                 translation_domain=DOMAIN,
