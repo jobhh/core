@@ -300,6 +300,8 @@ CLAUDE.md @home-assistant/core
 /tests/components/cambridge_audio/ @noahhusby
 /homeassistant/components/camera/ @home-assistant/core
 /tests/components/camera/ @home-assistant/core
+/homeassistant/components/carlo_gavazzi_modbus/ @jobhh
+/tests/components/carlo_gavazzi_modbus/ @jobhh
 /homeassistant/components/casper_glow/ @mikeodr
 /tests/components/casper_glow/ @mikeodr
 /homeassistant/components/cast/ @emontnemery

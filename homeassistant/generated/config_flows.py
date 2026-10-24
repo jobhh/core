@@ -130,6 +130,7 @@ FLOWS = {
         "caldav",
         "cambridge_audio",
         "canary",
+        "carlo_gavazzi_modbus",
         "casper_glow",
         "cast",
         "ccm15",

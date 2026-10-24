@@ -1,0 +1,149 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "no_serial_number": "The meter did not report a serial number, which is needed to identify it.",
+      "unsupported_meter": "A device answers on that port, but it is not an EM530 or EM540."
+    },
+    "step": {
+      "user": {
+        "data": {
+          "baudrate": "Baud rate",
+          "device": "Serial port"
+        },
+        "data_description": {
+          "baudrate": "The baud rate set on the meter, under rS485. The factory default is 9600.",
+          "device": "The serial port the meter's RS485 bus is wired to. ESPHome serial proxies are listed here too."
+        },
+        "description": "Set up a Carlo Gavazzi EM530 or EM540 energy meter wired over RS485.",
+        "sections": {
+          "more_options": {
+            "data": {
+              "unit_id": "Modbus address"
+            },
+            "data_description": {
+              "unit_id": "The Modbus address set on the meter, under rS485. The factory default is 1."
+            },
+            "name": "More options"
+          }
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "active_power_demand": {
+        "name": "Active power demand"
+      },
+      "active_power_demand_max": {
+        "name": "Maximum active power demand"
+      },
+      "active_power_phase": {
+        "name": "Power {phase}"
+      },
+      "active_tariff": {
+        "name": "Active tariff",
+        "state": {
+          "none": "None",
+          "tariff_1": "Tariff 1",
+          "tariff_2": "Tariff 2"
+        }
+      },
+      "apparent_power_demand": {
+        "name": "Apparent power demand"
+      },
+      "apparent_power_demand_max": {
+        "name": "Maximum apparent power demand"
+      },
+      "apparent_power_phase": {
+        "name": "Apparent power {phase}"
+      },
+      "current_phase": {
+        "name": "Current {phase}"
+      },
+      "device_state": {
+        "name": "Meter state",
+        "state": {
+          "configuration_error": "Configuration error",
+          "fault": "Fault",
+          "run": "Running"
+        }
+      },
+      "energy_exported": {
+        "name": "Energy exported"
+      },
+      "energy_exported_partial": {
+        "name": "Energy exported (partial)"
+      },
+      "energy_imported": {
+        "name": "Energy imported"
+      },
+      "energy_imported_partial": {
+        "name": "Energy imported (partial)"
+      },
+      "energy_imported_phase": {
+        "name": "Energy imported {phase}"
+      },
+      "energy_imported_tariff": {
+        "name": "Energy imported tariff {tariff}"
+      },
+      "neutral_current": {
+        "name": "Neutral current"
+      },
+      "phase_sequence": {
+        "name": "Phase sequence",
+        "state": {
+          "l1_l2_l3": "L1-L2-L3",
+          "l1_l3_l2": "L1-L3-L2"
+        }
+      },
+      "power_factor_phase": {
+        "name": "Power factor {phase}"
+      },
+      "reactive_energy_exported": {
+        "name": "Reactive energy exported"
+      },
+      "reactive_energy_imported": {
+        "name": "Reactive energy imported"
+      },
+      "reactive_power_phase": {
+        "name": "Reactive power {phase}"
+      },
+      "run_hours": {
+        "name": "Run hours"
+      },
+      "run_hours_lifetime": {
+        "name": "Lifetime hours"
+      },
+      "thd_current_phase": {
+        "name": "Current THD {phase}"
+      },
+      "thd_voltage_phase": {
+        "name": "Voltage THD {phase}"
+      },
+      "voltage_line": {
+        "name": "Voltage {line}"
+      },
+      "voltage_phase": {
+        "name": "Voltage {phase}"
+      }
+    }
+  },
+  "exceptions": {
+    "communication_error": {
+      "message": "Could not communicate with the meter: {error}"
+    },
+    "link_settings_in_use": {
+      "message": "The serial port is already in use at other settings: {error}"
+    },
+    "unsupported_meter": {
+      "message": "[%key:component::carlo_gavazzi_modbus::config::error::unsupported_meter%]"
+    },
+    "wrong_meter": {
+      "message": "A different meter answers at this address than the one this entry was set up for."
+    }
+  }
+}

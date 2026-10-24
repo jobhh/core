@@ -142,6 +142,7 @@ homeassistant.components.calendar.*
 homeassistant.components.cambridge_audio.*
 homeassistant.components.camera.*
 homeassistant.components.canary.*
+homeassistant.components.carlo_gavazzi_modbus.*
 homeassistant.components.casper_glow.*
 homeassistant.components.centriconnect.*
 homeassistant.components.cert_expiry.*

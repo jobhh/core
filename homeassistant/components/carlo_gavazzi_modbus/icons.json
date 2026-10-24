@@ -1,0 +1,27 @@
+{
+  "entity": {
+    "sensor": {
+      "active_tariff": {
+        "default": "mdi:cash-clock"
+      },
+      "device_state": {
+        "default": "mdi:meter-electric"
+      },
+      "phase_sequence": {
+        "default": "mdi:sine-wave"
+      },
+      "run_hours": {
+        "default": "mdi:timer-outline"
+      },
+      "run_hours_lifetime": {
+        "default": "mdi:timer-outline"
+      },
+      "thd_current_phase": {
+        "default": "mdi:chart-bell-curve"
+      },
+      "thd_voltage_phase": {
+        "default": "mdi:chart-bell-curve"
+      }
+    }
+  }
+}

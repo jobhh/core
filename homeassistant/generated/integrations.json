@@ -1561,6 +1561,15 @@
       "iot_class": "cloud_polling",
       "single_config_entry": true
     },
+    "carlo_gavazzi_modbus": {
+      "name": "Carlo Gavazzi Modbus",
+      "integration_type": "device",
+      "categories": [
+        "energy.meters_monitoring"
+      ],
+      "config_flow": true,
+      "iot_class": "local_polling"
+    },
     "carrier": {
       "name": "Carrier",
       "integration_type": "virtual",

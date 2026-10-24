@@ -1,0 +1,18 @@
+{
+  "domain": "carlo_gavazzi_modbus",
+  "name": "Carlo Gavazzi Modbus",
+  "categories": ["energy.meters_monitoring"],
+  "codeowners": ["@jobhh"],
+  "config_flow": true,
+  "dependencies": ["modbus", "usb"],
+  "documentation": "https://www.home-assistant.io/integrations/carlo_gavazzi_modbus",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "loggers": [
+    "carlo_gavazzi_energy_meter_modbus",
+    "modbus_connection",
+    "tmodbus"
+  ],
+  "quality_scale": "bronze",
+  "requirements": ["carlo-gavazzi-energy-meter-modbus==0.1.0"]
+}
