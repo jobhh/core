@@ -1,5 +1,19 @@
 {
   "entity": {
+    "binary_sensor": {
+      "alarm": {
+        "default": "mdi:alarm-light",
+        "state": {
+          "off": "mdi:alarm-light-off"
+        }
+      },
+      "digital_input": {
+        "default": "mdi:electric-switch-closed",
+        "state": {
+          "off": "mdi:electric-switch"
+        }
+      }
+    },
     "sensor": {
       "active_tariff": {
         "default": "mdi:cash-clock"

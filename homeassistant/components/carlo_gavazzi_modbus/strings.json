@@ -57,6 +57,17 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "alarm": {
+        "name": "Alarm"
+      },
+      "digital_input": {
+        "name": "Digital input"
+      },
+      "wrong_connection": {
+        "name": "Wiring error"
+      }
+    },
     "sensor": {
       "active_power_demand": {
         "name": "Active power demand"
