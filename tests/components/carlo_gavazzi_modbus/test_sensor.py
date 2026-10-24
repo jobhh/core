@@ -126,10 +126,12 @@ async def test_retry_on_a_dead_link_keeps_the_poll(
 ) -> None:
     """Test a link that dies between a poll and its retry keeps what was read."""
     read = mock_modbus_unit.read_input_registers
+    failed: list[int] = []
 
     async def read_input_registers(address: int, count: int) -> list[int]:
-        if address == ENERGY_REGISTER:
+        if address == ENERGY_REGISTER and not failed:
             # The link goes down while the energy counters are read.
+            failed.append(address)
             mock_modbus_unit.fail_requests(ModbusTimeoutError())
             raise IllegalDataAddressError
         return await read(address, count)
