@@ -13,6 +13,6 @@
     "modbus_connection",
     "tmodbus"
   ],
-  "quality_scale": "bronze",
+  "quality_scale": "platinum",
   "requirements": ["carlo-gavazzi-energy-meter-modbus==0.1.0"]
 }
