@@ -22,3 +22,6 @@ DEFAULT_PORT: Final = 502
 
 # A full poll takes about a second at the factory 9600 baud.
 SCAN_INTERVAL: Final = timedelta(seconds=5)
+
+# The settings only change on the meter's own keys.
+SETTINGS_SCAN_INTERVAL: Final = timedelta(minutes=10)

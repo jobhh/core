@@ -25,7 +25,7 @@ async def test_diagnostics(
     )
 
     # How long the poll took depends on the machine running the test.
-    assert isinstance(diagnostics["poll"]["duration"], float)
+    assert isinstance(diagnostics["polls"]["readings"]["duration"], float)
     assert diagnostics == snapshot(exclude=props("duration"))
 
 

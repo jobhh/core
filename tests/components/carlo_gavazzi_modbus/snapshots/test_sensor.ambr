@@ -754,6 +754,125 @@
     'state': '31.94',
   })
 # ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_demand_interval-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_demand_interval',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Demand interval',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': <SensorDeviceClass.DURATION: 'duration'>,
+    'original_icon': None,
+    'original_name': 'Demand interval',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'demand_interval',
+    'unique_id': 'XX0000000000X_demand_interval',
+    'unit_of_measurement': <UnitOfTime.MINUTES: 'min'>,
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_demand_interval-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'duration',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Demand interval',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: <UnitOfTime.MINUTES: 'min'>,
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_demand_interval',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '15',
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_digital_input_function-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'tariff',
+        'remote_status',
+        'partial_meter',
+        'reset_partial',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_digital_input_function',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Digital input function',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Digital input function',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'digital_input_function',
+    'unique_id': 'XX0000000000X_digital_input_function',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_digital_input_function-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Digital input function',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'tariff',
+        'remote_status',
+        'partial_meter',
+        'reset_partial',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_digital_input_function',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'tariff',
+  })
+# ---
 # name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_energy_exported-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
@@ -1506,6 +1625,130 @@
     'last_reported': <ANY>,
     'last_updated': <ANY>,
     'state': '4769.9',
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_measurement_mode-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'absolute',
+        'phase_accumulation',
+        'bidirectional',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_measurement_mode',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Measurement mode',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Measurement mode',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'measurement_mode',
+    'unique_id': 'XX0000000000X_measurement_mode',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_measurement_mode-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Measurement mode',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'absolute',
+        'phase_accumulation',
+        'bidirectional',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_measurement_mode',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'bidirectional',
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_measuring_system-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'three_phase_with_neutral',
+        'three_phase',
+        'two_phase',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_measuring_system',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Measuring system',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Measuring system',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'measuring_system',
+    'unique_id': 'XX0000000000X_measuring_system',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_measuring_system-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Measuring system',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'three_phase_with_neutral',
+        'three_phase',
+        'two_phase',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_em540_measuring_system',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'three_phase_with_neutral',
   })
 # ---
 # name: test_sensors[em540.json][sensor.carlo_gavazzi_em540_meter_state-entry]
@@ -3708,6 +3951,61 @@
     'state': '0.0',
   })
 # ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_demand_interval-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'KX12345')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_demand_interval',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Demand interval',
+    'options': dict({
+      'sensor': dict({
+        'suggested_display_precision': 2,
+      }),
+    }),
+    'original_device_class': <SensorDeviceClass.DURATION: 'duration'>,
+    'original_icon': None,
+    'original_name': 'Demand interval',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'demand_interval',
+    'unique_id': 'KX12345_demand_interval',
+    'unit_of_measurement': <UnitOfTime.MINUTES: 'min'>,
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_demand_interval-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'duration',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi ET340 Demand interval',
+      <EntityStateAttribute.UNIT_OF_MEASUREMENT: 'unit_of_measurement'>: <UnitOfTime.MINUTES: 'min'>,
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_demand_interval',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': '15',
+  })
+# ---
 # name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_energy_exported-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
@@ -4460,6 +4758,128 @@
     'last_reported': <ANY>,
     'last_updated': <ANY>,
     'state': '5200.0',
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_measurement_mode-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'easy_connection',
+        'bidirectional',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'KX12345')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_measurement_mode',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Measurement mode',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Measurement mode',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'measurement_mode',
+    'unique_id': 'KX12345_measurement_mode',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_measurement_mode-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi ET340 Measurement mode',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'easy_connection',
+        'bidirectional',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_measurement_mode',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'bidirectional',
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_measuring_system-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'three_phase_with_neutral',
+        'three_phase',
+        'two_phase',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'KX12345')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_measuring_system',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Measuring system',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Measuring system',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'measuring_system',
+    'unique_id': 'KX12345_measuring_system',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_measuring_system-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi ET340 Measuring system',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'three_phase_with_neutral',
+        'three_phase',
+        'two_phase',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_measuring_system',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'three_phase_with_neutral',
   })
 # ---
 # name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_neutral_current-entry]
@@ -5444,6 +5864,66 @@
     'last_reported': <ANY>,
     'last_updated': <ANY>,
     'state': '1234.56',
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_tariff_source-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': dict({
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'digital_input',
+        'serial',
+      ]),
+    }),
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'KX12345')]>,
+    'disabled_by': None,
+    'domain': 'sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_tariff_source',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Tariff source',
+    'options': dict({
+    }),
+    'original_device_class': <SensorDeviceClass.ENUM: 'enum'>,
+    'original_icon': None,
+    'original_name': 'Tariff source',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'tariff_source',
+    'unique_id': 'KX12345_tariff_source',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_tariff_source-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'enum',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi ET340 Tariff source',
+      <SensorEntityCapabilityAttribute.OPTIONS: 'options'>: list([
+        'digital_input',
+        'serial',
+      ]),
+    }),
+    'context': <ANY>,
+    'entity_id': 'sensor.carlo_gavazzi_et340_tariff_source',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'serial',
   })
 # ---
 # name: test_sensors[et340.json][sensor.carlo_gavazzi_et340_voltage_l1-entry]

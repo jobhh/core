@@ -9,7 +9,10 @@ from modbus_connection.model import Component, RegisterField
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 
-from .coordinator import CarloGavazziModbusConfigEntry
+from .coordinator import (
+    CarloGavazziModbusConfigEntry,
+    CarloGavazziModbusDataUpdateCoordinator,
+)
 
 TO_REDACT = {"serial_number"}
 
@@ -32,6 +35,22 @@ def _component_data(component: Component | None) -> dict[str, Any] | None:
         if not name.startswith("_") and isinstance(attribute, (RegisterField, property))
     }
     return {name: getattr(component, name) for name in sorted(names)}
+
+
+def _poll_data(coordinator: CarloGavazziModbusDataUpdateCoordinator) -> dict[str, Any]:
+    """What a coordinator's most recent poll got out of the meter."""
+    return {
+        "duration": (
+            coordinator.last_poll_duration.total_seconds()
+            if coordinator.last_poll_duration is not None
+            else None
+        ),
+        "updated": sorted(coordinator.data.updated),
+        "failed": {
+            subsystem: str(error) or type(error).__name__
+            for subsystem, error in coordinator.data.failed.items()
+        },
+    }
 
 
 async def _async_read_whole(
@@ -64,8 +83,8 @@ async def async_get_config_entry_diagnostics(
     serves undecoded, read fresh: a value the integration decodes wrongly can
     only be told from what the meter sent.
     """
-    coordinator = entry.runtime_data.coordinator
-    meter = coordinator.meter
+    runtime_data = entry.runtime_data
+    meter = runtime_data.meter
     names = em500.ALL if isinstance(meter, EM500Meter) else em300.ALL
 
     # Without an answer, what the polls last read is all there is.
@@ -85,17 +104,9 @@ async def async_get_config_entry_diagnostics(
 
     data: dict[str, Any] = {
         "wide_reads": meter.wide_reads if isinstance(meter, EM500Meter) else None,
-        "poll": {
-            "duration": (
-                coordinator.last_poll_duration.total_seconds()
-                if coordinator.last_poll_duration is not None
-                else None
-            ),
-            "updated": sorted(coordinator.data.updated),
-            "failed": {
-                subsystem: str(error) or type(error).__name__
-                for subsystem, error in coordinator.data.failed.items()
-            },
+        "polls": {
+            "readings": _poll_data(runtime_data.readings),
+            "settings": _poll_data(runtime_data.settings),
         },
         **{name: _component_data(component) for name, component in components.items()},
         "raw": raw,

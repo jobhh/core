@@ -99,6 +99,9 @@
       },
       "wrong_connection": {
         "name": "Wiring error"
+      },
+      "wrong_connection_detection": {
+        "name": "Wiring check"
       }
     },
     "button": {
@@ -142,12 +145,24 @@
       "current_phase": {
         "name": "Current {phase}"
       },
+      "demand_interval": {
+        "name": "Demand interval"
+      },
       "device_state": {
         "name": "Meter state",
         "state": {
           "configuration_error": "Configuration error",
           "fault": "Fault",
           "run": "Running"
+        }
+      },
+      "digital_input_function": {
+        "name": "Digital input function",
+        "state": {
+          "partial_meter": "Partial counters enable",
+          "remote_status": "Remote status",
+          "reset_partial": "Partial counters reset",
+          "tariff": "Tariff selection"
         }
       },
       "energy_exported": {
@@ -170,6 +185,23 @@
       },
       "energy_imported_tariff": {
         "name": "Energy imported tariff {tariff}"
+      },
+      "measurement_mode": {
+        "name": "Measurement mode",
+        "state": {
+          "absolute": "Absolute",
+          "bidirectional": "Bidirectional",
+          "easy_connection": "Easy connection",
+          "phase_accumulation": "Phase accumulation"
+        }
+      },
+      "measuring_system": {
+        "name": "Measuring system",
+        "state": {
+          "three_phase": "Three phases, no neutral (3P)",
+          "three_phase_with_neutral": "Three phases with neutral (3Pn)",
+          "two_phase": "Two phases with neutral (2P)"
+        }
       },
       "neutral_current": {
         "name": "Neutral current"
@@ -198,6 +230,13 @@
       },
       "run_hours_lifetime": {
         "name": "Lifetime hours"
+      },
+      "tariff_source": {
+        "name": "Tariff source",
+        "state": {
+          "digital_input": "[%key:component::carlo_gavazzi_modbus::entity::binary_sensor::digital_input::name%]",
+          "serial": "Modbus"
+        }
       },
       "thd_current_phase": {
         "name": "Current THD {phase}"

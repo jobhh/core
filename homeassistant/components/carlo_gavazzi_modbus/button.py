@@ -69,7 +69,7 @@ async def async_setup_entry(
     async_add_entities(
         CarloGavazziModbusButtonEntity(entry=entry, description=description)
         for description in BUTTONS
-        if description.supported_fn(entry.runtime_data.coordinator.meter)
+        if description.supported_fn(entry.runtime_data.meter)
     )
 
 

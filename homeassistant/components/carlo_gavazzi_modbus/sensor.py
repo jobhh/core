@@ -6,11 +6,17 @@ from enum import IntEnum
 from typing import override
 
 from carlo_gavazzi_energy_meter_modbus import (
+    DemandInterval,
     DeviceState,
+    DigitalInputFunction,
     EM500Meter,
+    MeasurementMode,
+    MeasuringSystem,
     Meter,
     PhaseSequence,
     Tariff,
+    TariffSource,
+    em300,
 )
 
 from homeassistant.components.sensor import (
@@ -96,6 +102,16 @@ class CarloGavazziModbusSensorEntityDescription(SensorEntityDescription):
     exists_fn: Callable[[Meter], bool] = lambda _: True
 
 
+def _is_em500(meter: Meter) -> bool:
+    """Return whether the meter is of the EM500 series."""
+    return isinstance(meter, EM500Meter)
+
+
+def _is_em300(meter: Meter) -> bool:
+    """Return whether the meter is of the EM300 series."""
+    return not isinstance(meter, EM500Meter)
+
+
 def _has_phase(phase: int) -> Callable[[Meter], bool]:
     """Return whether the meter measures a phase: a 2P system has no L3."""
     return lambda meter: phase < 3 or meter.phases != 2
@@ -120,6 +136,7 @@ def _enum(
     subsystem: str,
     field: str,
     options: type[IntEnum],
+    enabled: bool = False,
     exists_fn: Callable[[Meter], bool] = lambda _: True,
 ) -> CarloGavazziModbusSensorEntityDescription:
     """Describe a diagnostic sensor reporting one of an enum's members."""
@@ -130,7 +147,7 @@ def _enum(
         device_class=SensorDeviceClass.ENUM,
         options=[member.name.lower() for member in options],
         entity_category=EntityCategory.DIAGNOSTIC,
-        entity_registry_enabled_default=False,
+        entity_registry_enabled_default=enabled,
         exists_fn=exists_fn,
         field=field,
     )
@@ -509,6 +526,53 @@ SENSORS: tuple[CarloGavazziModbusSensorEntityDescription, ...] = (
         field="device_state",
         options=DeviceState,
     ),
+    # How the meter is set up on its own keys. The measuring system and mode
+    # decide which of the sensors above exist, so they explain a missing one.
+    _enum(
+        key="measuring_system",
+        subsystem="settings",
+        field="measuring_system",
+        options=MeasuringSystem,
+        enabled=True,
+    ),
+    _enum(
+        key="measurement_mode",
+        subsystem="settings",
+        field="measurement_mode",
+        options=MeasurementMode,
+        enabled=True,
+        exists_fn=_is_em500,
+    ),
+    _enum(
+        key="measurement_mode",
+        subsystem="settings",
+        field="measurement_mode",
+        options=em300.MeasurementMode,
+        enabled=True,
+        exists_fn=_is_em300,
+    ),
+    CarloGavazziModbusSensorEntityDescription(
+        key="demand_interval",
+        translation_key="demand_interval",
+        subsystem="settings",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        field="demand_interval",
+    ),
+    _enum(
+        key="digital_input_function",
+        subsystem="settings",
+        field="digital_input_function",
+        options=DigitalInputFunction,
+    ),
+    _enum(
+        key="tariff_source",
+        subsystem="settings",
+        field="tariff_source",
+        options=TariffSource,
+    ),
 )
 
 
@@ -518,7 +582,7 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up the sensors for what the meter measures, as it is wired."""
-    meter = entry.runtime_data.coordinator.meter
+    meter = entry.runtime_data.meter
     async_add_entities(
         CarloGavazziModbusSensorEntity(
             entry=entry, subsystem=subsystem, description=description
@@ -555,6 +619,9 @@ class CarloGavazziModbusSensorEntity(CarloGavazziModbusEntity, SensorEntity):
         """Return the value the meter reported on the last poll."""
         component = getattr(self.coordinator.meter, self._subsystem)
         value: StateType | IntEnum = getattr(component, self.entity_description.field)
+        if isinstance(value, DemandInterval):
+            # The EM300 series reports the interval in minutes to begin with.
+            return value.minutes
         if isinstance(value, IntEnum):
             return value.name.lower()
         return value

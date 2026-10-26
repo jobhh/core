@@ -8,7 +8,7 @@ that unit to the ``carlo-gavazzi-energy-meter-modbus`` library.
 
 from typing import TYPE_CHECKING
 
-from carlo_gavazzi_energy_meter_modbus import UnsupportedMeterError
+from carlo_gavazzi_energy_meter_modbus import UnsupportedMeterError, UpdateReport
 from modbus_connection import ModbusError
 
 from homeassistant.components.modbus import async_get_unit
@@ -23,8 +23,9 @@ from homeassistant.exceptions import (
 from .const import CONF_UNIT_ID, DOMAIN
 from .coordinator import (
     CarloGavazziModbusConfigEntry,
-    CarloGavazziModbusDataUpdateCoordinator,
     CarloGavazziModbusRuntimeData,
+    CarloGavazziModbusSettingsCoordinator,
+    create_readings_coordinator,
 )
 from .entity import meter_device_info
 from .helpers import async_setup_meter, create_modbus_params
@@ -76,11 +77,17 @@ async def async_setup_entry(
             translation_key="wrong_meter",
         )
 
-    coordinator = CarloGavazziModbusDataUpdateCoordinator(hass, entry, meter)
-    await coordinator.async_config_entry_first_refresh()
+    readings = create_readings_coordinator(hass, entry, meter)
+    await readings.async_config_entry_first_refresh()
+
+    # Setting the meter up just read the settings, so there is no need to ask
+    # again; this starts their slow poll.
+    settings = CarloGavazziModbusSettingsCoordinator(hass, entry, meter)
+    settings.async_set_updated_data(UpdateReport(updated=set(settings.subsystems)))
 
     entry.runtime_data = CarloGavazziModbusRuntimeData(
-        coordinator=coordinator,
+        readings=readings,
+        settings=settings,
         device_info=meter_device_info(meter, serial_number),
     )
 

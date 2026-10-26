@@ -76,17 +76,26 @@
       'voltage_l_l': 403.5,
       'voltage_l_n': 232.9,
     }),
-    'poll': dict({
-      'failed': dict({
+    'polls': dict({
+      'readings': dict({
+        'failed': dict({
+        }),
+        'updated': list([
+          'demand',
+          'energy',
+          'measurements',
+          'power_quality',
+          'status',
+          'tariff_energy',
+        ]),
       }),
-      'updated': list([
-        'demand',
-        'energy',
-        'measurements',
-        'power_quality',
-        'status',
-        'tariff_energy',
-      ]),
+      'settings': dict({
+        'failed': dict({
+        }),
+        'updated': list([
+          'settings',
+        ]),
+      }),
     }),
     'power_quality': dict({
       'load_type': -1,
@@ -405,19 +414,28 @@
       'voltage_l_l': 398.8,
       'voltage_l_n': 230.4,
     }),
-    'poll': dict({
-      'failed': dict({
+    'polls': dict({
+      'readings': dict({
+        'failed': dict({
+        }),
+        'updated': list([
+          'demand',
+          'energy',
+          'exported_per_phase',
+          'measurements',
+          'power_quality',
+          'run_hours',
+          'status',
+          'tariff_energy',
+        ]),
       }),
-      'updated': list([
-        'demand',
-        'energy',
-        'exported_per_phase',
-        'measurements',
-        'power_quality',
-        'run_hours',
-        'status',
-        'tariff_energy',
-      ]),
+      'settings': dict({
+        'failed': dict({
+        }),
+        'updated': list([
+          'settings',
+        ]),
+      }),
     }),
     'power_quality': dict({
       'neutral_current': 0.123,

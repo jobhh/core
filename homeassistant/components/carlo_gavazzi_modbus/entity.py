@@ -62,7 +62,7 @@ class CarloGavazziModbusEntity(
         description: EntityDescription,
     ) -> None:
         """Initialize a Carlo Gavazzi Modbus entity."""
-        super().__init__(coordinator=entry.runtime_data.coordinator)
+        super().__init__(coordinator=entry.runtime_data.coordinator_for(subsystem))
         self.entity_description = description
         self._subsystem = subsystem
         self._attr_unique_id = f"{entry.unique_id}_{description.key}"

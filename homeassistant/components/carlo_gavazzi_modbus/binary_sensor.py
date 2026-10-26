@@ -53,6 +53,14 @@ BINARY_SENSORS: tuple[CarloGavazziModbusBinarySensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         value_fn=attrgetter("status.digital_input"),
     ),
+    CarloGavazziModbusBinarySensorEntityDescription(
+        key="wrong_connection_detection",
+        translation_key="wrong_connection_detection",
+        subsystem="settings",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        value_fn=attrgetter("settings.wrong_connection_detection"),
+    ),
 )
 
 
@@ -65,11 +73,11 @@ async def async_setup_entry(
 
     The EM300 series reports only the wiring check.
     """
-    status = type(entry.runtime_data.coordinator.meter.status)
+    meter = entry.runtime_data.meter
     async_add_entities(
         CarloGavazziModbusBinarySensorEntity(entry=entry, description=description)
         for description in BINARY_SENSORS
-        if hasattr(status, description.key)
+        if hasattr(type(getattr(meter, description.subsystem)), description.key)
     )
 
 

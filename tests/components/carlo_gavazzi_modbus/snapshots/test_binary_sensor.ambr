@@ -99,6 +99,56 @@
     'state': 'off',
   })
 # ---
+# name: test_binary_sensors[em540.json][binary_sensor.carlo_gavazzi_em540_wiring_check-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'XX0000000000X')]>,
+    'disabled_by': None,
+    'domain': 'binary_sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'binary_sensor.carlo_gavazzi_em540_wiring_check',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Wiring check',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Wiring check',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'wrong_connection_detection',
+    'unique_id': 'XX0000000000X_wrong_connection_detection',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_binary_sensors[em540.json][binary_sensor.carlo_gavazzi_em540_wiring_check-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi EM540 Wiring check',
+    }),
+    'context': <ANY>,
+    'entity_id': 'binary_sensor.carlo_gavazzi_em540_wiring_check',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'on',
+  })
+# ---
 # name: test_binary_sensors[em540.json][binary_sensor.carlo_gavazzi_em540_wiring_error-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
@@ -144,6 +194,56 @@
     }),
     'context': <ANY>,
     'entity_id': 'binary_sensor.carlo_gavazzi_em540_wiring_error',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'on',
+  })
+# ---
+# name: test_binary_sensors[et340.json][binary_sensor.carlo_gavazzi_et340_wiring_check-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <DeviceEntry identifiers=[('carlo_gavazzi_modbus', 'KX12345')]>,
+    'disabled_by': None,
+    'domain': 'binary_sensor',
+    'entity_category': <EntityCategory.DIAGNOSTIC: 'diagnostic'>,
+    'entity_id': 'binary_sensor.carlo_gavazzi_et340_wiring_check',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Wiring check',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Wiring check',
+    'platform': 'carlo_gavazzi_modbus',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'wrong_connection_detection',
+    'unique_id': 'KX12345_wrong_connection_detection',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_binary_sensors[et340.json][binary_sensor.carlo_gavazzi_et340_wiring_check-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Carlo Gavazzi ET340 Wiring check',
+    }),
+    'context': <ANY>,
+    'entity_id': 'binary_sensor.carlo_gavazzi_et340_wiring_check',
     'last_changed': <ANY>,
     'last_reported': <ANY>,
     'last_updated': <ANY>,

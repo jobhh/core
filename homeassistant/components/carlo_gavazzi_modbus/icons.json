@@ -12,6 +12,9 @@
         "state": {
           "off": "mdi:electric-switch"
         }
+      },
+      "wrong_connection_detection": {
+        "default": "mdi:cable-data"
       }
     },
     "button": {
@@ -29,8 +32,20 @@
       "active_tariff": {
         "default": "mdi:cash-clock"
       },
+      "demand_interval": {
+        "default": "mdi:timer-cog-outline"
+      },
       "device_state": {
         "default": "mdi:meter-electric"
+      },
+      "digital_input_function": {
+        "default": "mdi:electric-switch"
+      },
+      "measurement_mode": {
+        "default": "mdi:swap-horizontal"
+      },
+      "measuring_system": {
+        "default": "mdi:transmission-tower"
       },
       "phase_sequence": {
         "default": "mdi:sine-wave"
@@ -40,6 +55,9 @@
       },
       "run_hours_lifetime": {
         "default": "mdi:timer-outline"
+      },
+      "tariff_source": {
+        "default": "mdi:cash-clock"
       },
       "thd_current_phase": {
         "default": "mdi:chart-bell-curve"

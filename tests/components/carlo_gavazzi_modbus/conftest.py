@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
+from freezegun.api import FrozenDateTimeFactory
 from modbus_connection import ModbusUnit
 from modbus_connection.mock import MockModbusConnection, MockModbusUnit
 import pytest
@@ -149,9 +150,15 @@ def mock_config_entry(meter_fixture: str) -> MockConfigEntry:
 
 @pytest.fixture
 async def init_integration(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    freezer: FrozenDateTimeFactory,
 ) -> MockConfigEntry:
-    """Set up the integration with the seeded meter."""
+    """Set up the integration with the seeded meter.
+
+    Time is frozen first: freezing it later moves the clock, which would set
+    off the slow settings poll along with the next readings poll.
+    """
     mock_config_entry.add_to_hass(hass)
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()
