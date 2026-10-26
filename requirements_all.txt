@@ -786,7 +786,7 @@ cached-ipaddress==1.1.2
 caldav==3.5.0a0
 
 # homeassistant.components.carlo_gavazzi_modbus
-carlo-gavazzi-energy-meter-modbus==0.1.0
+carlo-gavazzi-energy-meter-modbus==0.1.1
 
 # homeassistant.components.chef_iq
 chefiq-ble==1.0.1
