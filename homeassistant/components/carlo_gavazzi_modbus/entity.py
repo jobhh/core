@@ -51,6 +51,9 @@ class CarloGavazziModbusEntity(
 
     _attr_has_entity_name = True
 
+    _field: str | None = None
+    """The field this entity shows, which the coordinator then reads."""
+
     def __init__(
         self,
         *,
@@ -64,6 +67,15 @@ class CarloGavazziModbusEntity(
         self._subsystem = subsystem
         self._attr_unique_id = f"{entry.unique_id}_{description.key}"
         self._attr_device_info = entry.runtime_data.device_info
+
+    @override
+    async def async_added_to_hass(self) -> None:
+        """Have the coordinator read what this entity shows."""
+        await super().async_added_to_hass()
+        if self._field is not None:
+            self.async_on_remove(
+                self.coordinator.async_want(self._subsystem, self._field)
+            )
 
     @property
     @override

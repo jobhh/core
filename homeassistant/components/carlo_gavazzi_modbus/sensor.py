@@ -538,6 +538,17 @@ class CarloGavazziModbusSensorEntity(CarloGavazziModbusEntity, SensorEntity):
 
     entity_description: CarloGavazziModbusSensorEntityDescription
 
+    def __init__(
+        self,
+        *,
+        entry: CarloGavazziModbusConfigEntry,
+        subsystem: str,
+        description: CarloGavazziModbusSensorEntityDescription,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(entry=entry, subsystem=subsystem, description=description)
+        self._field = description.field
+
     @property
     @override
     def native_value(self) -> StateType:

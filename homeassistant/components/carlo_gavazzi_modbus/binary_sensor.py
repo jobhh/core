@@ -90,6 +90,7 @@ class CarloGavazziModbusBinarySensorEntity(
         super().__init__(
             entry=entry, subsystem=description.subsystem, description=description
         )
+        self._field = description.key
 
     @property
     @override
