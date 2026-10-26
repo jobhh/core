@@ -227,7 +227,7 @@
       "message": "[%key:component::carlo_gavazzi_modbus::config::error::unsupported_meter%]"
     },
     "wrong_meter": {
-      "message": "A different meter answers at this address than the one this entry was set up for."
+      "message": "A different meter answers at this address than the one this entry was set up for. Reconfigure the entry to point at the right meter."
     }
   }
 }

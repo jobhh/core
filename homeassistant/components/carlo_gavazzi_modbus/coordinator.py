@@ -17,6 +17,7 @@ from modbus_connection import ModbusError
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
+from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -44,6 +45,11 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
     own, and the report names what refreshed, which is what entities read
     their availability from.
 
+    The meter's serial number is read at setup, and again once the link comes
+    back after nothing answered: replacing a meter takes it off the bus, and
+    the one put in its place at the same address must not carry on under the
+    old one's entities.
+
     Only what enabled entities show is read. Each entity names its field when
     it is added; a sub-system nobody wants is skipped, and the others are read
     for just the wanted fields. Enabling an entity reloads the entry, which
@@ -62,6 +68,7 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
         self.meter = meter
         self.last_poll_duration: timedelta | None = None
         self._silent: set[str] = set()
+        self._check_identity = False
         self._readings: tuple[str, ...] = (
             em500.READINGS if isinstance(meter, EM500Meter) else em300.READINGS
         )
@@ -121,8 +128,11 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
 
         start = time.monotonic()
         try:
+            if self._check_identity:
+                await self._async_check_identity()
             report = await self.meter.async_poll(names)
         except ModbusError as err:
+            self._check_identity = True
             raise UpdateFailed(
                 translation_domain=DOMAIN,
                 translation_key="communication_error",
@@ -139,6 +149,20 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
         self._log_silence(report)
         return report
 
+    async def _async_check_identity(self) -> None:
+        """Read the serial number, and stop if another meter answers.
+
+        Stays due until it passes, so a wrong meter keeps the entities
+        unavailable for as long as it is there.
+        """
+        await self.meter.identity.async_update()
+        if self.meter.serial_number != self.config_entry.unique_id:
+            raise ConfigEntryError(
+                translation_domain=DOMAIN,
+                translation_key="wrong_meter",
+            )
+        self._check_identity = False
+
     async def _async_retry(
         self, report: UpdateReport, names: Iterable[str]
     ) -> UpdateReport:
@@ -151,6 +175,7 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
             retried = await self.meter.async_poll(names)
         except ModbusError as err:
             LOGGER.debug("%s: the retry failed (%s); keeping the poll", self.name, err)
+            self._check_identity = True
             return report
         return _merge(report, retried)
 

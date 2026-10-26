@@ -2,19 +2,21 @@
 
 from unittest.mock import patch
 
+from freezegun.api import FrozenDateTimeFactory
 from modbus_connection import ModbusTimeoutError
 from modbus_connection.mock import MockModbusUnit
 import pytest
-from pytest_homeassistant.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry, async_fire_time_changed
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.carlo_gavazzi_modbus.const import DOMAIN
+from homeassistant.components.carlo_gavazzi_modbus.const import DOMAIN, SCAN_INTERVAL
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 
-from .conftest import ENTRY_DATA, async_seed_unit
+from .conftest import ENTRY_DATA, SERIAL_REGISTERS, async_seed_unit
 
 # A model code no Carlo Gavazzi meter this integration supports reports.
 UNKNOWN_MODEL_CODE = 9999
@@ -110,3 +112,76 @@ async def test_first_poll_failing_retries(
         await hass.config_entries.async_setup(mock_config_entry.entry_id)
 
     assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
+
+
+async def _poll(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    """Run one scheduled poll."""
+    freezer.tick(SCAN_INTERVAL)
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+
+
+@pytest.mark.usefixtures("init_integration")
+async def test_other_meter_after_dead_link_is_refused(
+    hass: HomeAssistant,
+    mock_modbus_unit: MockModbusUnit,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Test a meter swapped in at the same address does not take over the entities.
+
+    Swapping a meter takes the address off the bus for a while, after which
+    the serial number is read again, and keeps being read until it matches.
+    """
+    power = "sensor.carlo_gavazzi_em540_power"
+    serial = {address: mock_modbus_unit.input[address] for address in SERIAL_REGISTERS}
+
+    mock_modbus_unit.fail_requests(ModbusTimeoutError())
+    await _poll(hass, freezer)
+    assert hass.states.get(power).state == STATE_UNAVAILABLE
+
+    mock_modbus_unit.fail_requests(None)
+    for registers in (mock_modbus_unit.input, mock_modbus_unit.holding):
+        registers[SERIAL_REGISTERS.start] = 0x5959
+    await _poll(hass, freezer)
+    assert hass.states.get(power).state == STATE_UNAVAILABLE
+    await _poll(hass, freezer)
+    assert hass.states.get(power).state == STATE_UNAVAILABLE
+
+    for registers in (mock_modbus_unit.input, mock_modbus_unit.holding):
+        registers.update(serial)
+    await _poll(hass, freezer)
+    assert hass.states.get(power).state != STATE_UNAVAILABLE
+
+    # Once it matched, the serial number is not read on every poll.
+    mock_modbus_unit.read_events.clear()
+    await _poll(hass, freezer)
+    assert all(
+        event.address not in SERIAL_REGISTERS for event in mock_modbus_unit.read_events
+    )
+
+
+@pytest.mark.usefixtures("init_integration")
+async def test_unanswered_check_of_the_meter_stays_due(
+    hass: HomeAssistant,
+    mock_modbus_unit: MockModbusUnit,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Test a serial number read that goes unanswered is tried again."""
+    power = "sensor.carlo_gavazzi_em540_power"
+    mock_modbus_unit.fail_requests(ModbusTimeoutError())
+    await _poll(hass, freezer)
+
+    mock_modbus_unit.fail_requests(None)
+    mock_modbus_unit.fail_read(
+        SERIAL_REGISTERS.start, ModbusTimeoutError(), register_type="input"
+    )
+    await _poll(hass, freezer)
+    assert hass.states.get(power).state == STATE_UNAVAILABLE
+
+    mock_modbus_unit.fail_read(SERIAL_REGISTERS.start, None, register_type="input")
+    mock_modbus_unit.read_events.clear()
+    await _poll(hass, freezer)
+    assert hass.states.get(power).state != STATE_UNAVAILABLE
+    assert any(
+        event.address in SERIAL_REGISTERS for event in mock_modbus_unit.read_events
+    )
