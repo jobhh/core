@@ -63,6 +63,9 @@ async def test_unsupported_meter_fails_setup(
 
     assert mock_config_entry.state is ConfigEntryState.SETUP_ERROR
     assert mock_config_entry.error_reason_translation_key == "unsupported_meter"
+    assert mock_config_entry.error_reason_translation_placeholders == {
+        "code": str(UNKNOWN_MODEL_CODE)
+    }
 
 
 async def test_wrong_meter_fails_setup(hass: HomeAssistant) -> None:

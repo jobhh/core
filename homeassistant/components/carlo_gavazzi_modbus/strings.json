@@ -7,7 +7,7 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "no_serial_number": "The meter did not report a serial number, which is needed to identify it.",
-      "unsupported_meter": "A device answers there, but it is not a supported Carlo Gavazzi energy meter."
+      "unsupported_meter": "A device answers there, but its model code {code} is not one of the supported meters: the EM530, EM540, EM330, EM340, ET330 and ET340."
     },
     "step": {
       "gateway": {

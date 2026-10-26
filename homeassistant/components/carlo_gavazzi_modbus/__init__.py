@@ -65,6 +65,7 @@ async def async_setup_entry(
         raise ConfigEntryError(
             translation_domain=DOMAIN,
             translation_key="unsupported_meter",
+            translation_placeholders={"code": str(err.code)},
         ) from err
 
     # The address can come to point at another meter, such as after rewiring

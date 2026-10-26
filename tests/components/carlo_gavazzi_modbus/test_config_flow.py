@@ -108,11 +108,16 @@ def _no_serial(unit: MockModbusUnit) -> None:
 
 @pytest.mark.usefixtures("mock_setup_entry")
 @pytest.mark.parametrize(
-    ("break_unit", "error"),
+    ("break_unit", "error", "placeholders"),
     [
-        pytest.param(_no_answer, "cannot_connect", id="no_answer"),
-        pytest.param(_other_model, "unsupported_meter", id="unsupported_meter"),
-        pytest.param(_no_serial, "no_serial_number", id="no_serial_number"),
+        pytest.param(_no_answer, "cannot_connect", {}, id="no_answer"),
+        pytest.param(
+            _other_model,
+            "unsupported_meter",
+            {"code": str(UNKNOWN_MODEL_CODE)},
+            id="unsupported_meter",
+        ),
+        pytest.param(_no_serial, "no_serial_number", {}, id="no_serial_number"),
     ],
 )
 async def test_user_flow_errors(
@@ -120,6 +125,7 @@ async def test_user_flow_errors(
     mock_modbus_unit: MockModbusUnit,
     break_unit: Any,
     error: str,
+    placeholders: dict[str, str],
 ) -> None:
     """Test the form reports what went wrong, and recovers."""
     snapshot = (dict(mock_modbus_unit.input), dict(mock_modbus_unit.holding))
@@ -132,6 +138,7 @@ async def test_user_flow_errors(
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": error}
+    assert result["description_placeholders"] == placeholders
 
     mock_modbus_unit.fail_requests(None)
     mock_modbus_unit.input.update(snapshot[0])
