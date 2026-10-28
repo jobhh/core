@@ -15,6 +15,9 @@ TYPE_GATEWAY: Final = "gateway"
 
 # The meters' factory defaults: 9600 baud 8N1, Modbus address 1.
 DEFAULT_BAUDRATE: Final = 9600
+
+# The rates both series offer on their RS485 port.
+BAUDRATES: Final = (9600, 19200, 38400, 57600, 115200)
 DEFAULT_UNIT_ID: Final = 1
 
 # The usual Modbus TCP port, which gateways also use in transparent mode.

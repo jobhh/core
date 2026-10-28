@@ -23,7 +23,7 @@ from homeassistant.components.carlo_gavazzi_modbus.const import (
 from homeassistant.config_entries import SOURCE_USER, ConfigEntryState, ConfigFlowResult
 from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from homeassistant.exceptions import HomeAssistantError
 
 from .conftest import (
@@ -38,7 +38,7 @@ from .conftest import (
 
 USER_INPUT = {
     CONF_DEVICE: DEVICE,
-    CONF_BAUDRATE: BAUDRATE,
+    CONF_BAUDRATE: str(BAUDRATE),
     SECTION_MORE_OPTIONS: {CONF_UNIT_ID: UNIT_ID},
 }
 
@@ -85,6 +85,29 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     assert result["title"] == "Carlo Gavazzi EM540"
     assert result["data"] == ENTRY_DATA
     assert result["result"].unique_id == SERIAL_NUMBER
+
+
+@pytest.mark.usefixtures("mock_setup_entry")
+async def test_user_flow_typed_baudrate(hass: HomeAssistant) -> None:
+    """Test a baud rate the list does not offer can be typed in."""
+    result = await _start_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {**USER_INPUT, CONF_BAUDRATE: "4800"}
+    )
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_BAUDRATE] == 4800
+    assert result["result"].unique_id == SERIAL_NUMBER
+
+
+@pytest.mark.parametrize("baudrate", ["fast", "300"])
+async def test_user_flow_invalid_baudrate(hass: HomeAssistant, baudrate: str) -> None:
+    """Test a typed baud rate that is no number, or too slow, is refused."""
+    result = await _start_flow(hass)
+    with pytest.raises(InvalidData):
+        await hass.config_entries.flow.async_configure(
+            result["flow_id"], {**USER_INPUT, CONF_BAUDRATE: baudrate}
+        )
 
 
 def _no_answer(unit: MockModbusUnit) -> None:
@@ -202,7 +225,7 @@ def _input(*, baudrate: int = BAUDRATE, unit_id: int = UNIT_ID) -> dict[str, Any
     """Return the form input for the seeded meter's port."""
     return {
         CONF_DEVICE: DEVICE,
-        CONF_BAUDRATE: baudrate,
+        CONF_BAUDRATE: str(baudrate),
         SECTION_MORE_OPTIONS: {CONF_UNIT_ID: unit_id},
     }
 
@@ -226,6 +249,9 @@ async def test_reconfigure_flow(
     result = await mock_config_entry.start_reconfigure_flow(hass)
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "reconfigure"
+    # The stored rate is picked in the list, which holds strings.
+    baudrate = next(key for key in result["data_schema"].schema if key == CONF_BAUDRATE)
+    assert baudrate.description == {"suggested_value": str(BAUDRATE)}
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], _input(unit_id=2)

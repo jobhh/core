@@ -21,11 +21,15 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
     SerialPortSelector,
     TextSelector,
 )
 
 from .const import (
+    BAUDRATES,
     CONF_BAUDRATE,
     CONF_UNIT_ID,
     DEFAULT_BAUDRATE,
@@ -63,11 +67,18 @@ MORE_OPTIONS = {
 STEP_SERIAL = probatio.Schema(
     {
         probatio.Required(CONF_DEVICE): SerialPortSelector(),
-        probatio.Required(CONF_BAUDRATE, default=DEFAULT_BAUDRATE): probatio.All(
-            NumberSelector(
-                NumberSelectorConfig(min=1200, step=1, mode=NumberSelectorMode.BOX)
+        # The rates the meters offer, with room to type another for a bus
+        # that runs at one of its own.
+        probatio.Required(CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)): probatio.All(
+            SelectSelector(
+                SelectSelectorConfig(
+                    options=[str(rate) for rate in BAUDRATES],
+                    mode=SelectSelectorMode.DROPDOWN,
+                    custom_value=True,
+                )
             ),
             probatio.Coerce(int),
+            probatio.Range(min=1200),
         ),
         **MORE_OPTIONS,
     }
@@ -105,14 +116,16 @@ def _flatten(connection_type: str, user_input: dict[str, Any]) -> dict[str, Any]
 
 def _sectioned(data: Mapping[str, Any]) -> dict[str, Any]:
     """Shape config entry data back into the sectioned form input."""
-    return {
-        **{
-            key: value
-            for key, value in data.items()
-            if key not in (CONF_TYPE, CONF_UNIT_ID)
-        },
-        SECTION_MORE_OPTIONS: {CONF_UNIT_ID: data[CONF_UNIT_ID]},
+    sectioned = {
+        key: value
+        for key, value in data.items()
+        if key not in (CONF_TYPE, CONF_UNIT_ID)
     }
+    # The baud rate is picked from a list of strings.
+    if CONF_BAUDRATE in sectioned:
+        sectioned[CONF_BAUDRATE] = str(sectioned[CONF_BAUDRATE])
+    sectioned[SECTION_MORE_OPTIONS] = {CONF_UNIT_ID: data[CONF_UNIT_ID]}
+    return sectioned
 
 
 def _needs_relink(entry: ConfigEntry, data: Mapping[str, Any]) -> bool:

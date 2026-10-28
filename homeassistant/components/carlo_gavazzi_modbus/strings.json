@@ -64,7 +64,7 @@
           "device": "Serial port"
         },
         "data_description": {
-          "baudrate": "The baud rate set on the meter, under rS485. The factory default is 9600.",
+          "baudrate": "The baud rate set on the meter, under rS485. The factory default is 9600. Type another rate if your bus runs at one the meters do not list.",
           "device": "The serial port the meter's RS485 bus is wired to. ESPHome serial proxies are listed here too."
         },
         "description": "Set up a Carlo Gavazzi energy meter, such as an EM540 or ET340, wired to a serial port or an ESPHome serial proxy.",
