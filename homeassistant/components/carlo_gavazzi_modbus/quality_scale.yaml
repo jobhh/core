@@ -75,9 +75,7 @@ rules:
   exception-translations: done
   icon-translations: done
   reconfiguration-flow: done
-  repair-issues:
-    status: exempt
-    comment: No repairable issues are raised.
+  repair-issues: done
   stale-devices:
     status: exempt
     comment: Each config entry is one meter, with no sub-devices.

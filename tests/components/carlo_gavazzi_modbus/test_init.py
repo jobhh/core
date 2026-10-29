@@ -14,7 +14,7 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import device_registry as dr, issue_registry as ir
 
 from .conftest import ENTRY_DATA, SERIAL_REGISTERS, async_seed_unit
 
@@ -121,9 +121,10 @@ async def _poll(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
     await hass.async_block_till_done()
 
 
-@pytest.mark.usefixtures("init_integration")
 async def test_other_meter_after_dead_link_is_refused(
     hass: HomeAssistant,
+    init_integration: MockConfigEntry,
+    issue_registry: ir.IssueRegistry,
     mock_modbus_unit: MockModbusUnit,
     freezer: FrozenDateTimeFactory,
 ) -> None:
@@ -146,11 +147,18 @@ async def test_other_meter_after_dead_link_is_refused(
     assert hass.states.get(power).state == STATE_UNAVAILABLE
     await _poll(hass, freezer)
     assert hass.states.get(power).state == STATE_UNAVAILABLE
+    # Raised where it is seen, rather than only in the log.
+    issue_id = f"wrong_meter_{init_integration.entry_id}"
+    issue = issue_registry.async_get_issue(DOMAIN, issue_id)
+    assert issue is not None
+    assert issue.translation_key == "wrong_meter"
+    assert issue.translation_placeholders == {"title": init_integration.title}
 
     for registers in (mock_modbus_unit.input, mock_modbus_unit.holding):
         registers.update(serial)
     await _poll(hass, freezer)
     assert hass.states.get(power).state != STATE_UNAVAILABLE
+    assert issue_registry.async_get_issue(DOMAIN, issue_id) is None
 
     # Once it matched, the serial number is not read on every poll.
     mock_modbus_unit.read_events.clear()
@@ -185,3 +193,25 @@ async def test_unanswered_check_of_the_meter_stays_due(
     assert any(
         event.address in SERIAL_REGISTERS for event in mock_modbus_unit.read_events
     )
+
+
+async def test_unloading_clears_the_other_meter_issue(
+    hass: HomeAssistant,
+    init_integration: MockConfigEntry,
+    issue_registry: ir.IssueRegistry,
+    mock_modbus_unit: MockModbusUnit,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    """Test unloading, such as to reconfigure, clears the issue it raised."""
+    mock_modbus_unit.fail_requests(ModbusTimeoutError())
+    await _poll(hass, freezer)
+    mock_modbus_unit.fail_requests(None)
+    for registers in (mock_modbus_unit.input, mock_modbus_unit.holding):
+        registers[SERIAL_REGISTERS.start] = 0x5959
+    await _poll(hass, freezer)
+    issue_id = f"wrong_meter_{init_integration.entry_id}"
+    assert issue_registry.async_get_issue(DOMAIN, issue_id) is not None
+
+    await hass.config_entries.async_unload(init_integration.entry_id)
+
+    assert issue_registry.async_get_issue(DOMAIN, issue_id) is None

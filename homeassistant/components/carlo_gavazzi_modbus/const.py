@@ -23,6 +23,10 @@ BAUDRATES: Final = (9600, 19200, 38400, 57600, 115200)
 # The model code is one register, which answers in milliseconds even at
 # 9600 baud, so every rate the meter is not at costs this long.
 DETECT_TIMEOUT: Final = 1.0
+
+# The same while searching every address, where most never answer: one
+# answers within about 0.1 seconds even through an ESPHome serial proxy.
+SEARCH_TIMEOUT: Final = 0.3
 DEFAULT_UNIT_ID: Final = 1
 
 # The usual Modbus TCP port, which gateways also use in transparent mode.

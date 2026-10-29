@@ -19,6 +19,7 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
     HomeAssistantError,
 )
+from homeassistant.helpers import issue_registry as ir
 
 from .const import CONF_UNIT_ID, DOMAIN
 from .coordinator import (
@@ -26,6 +27,7 @@ from .coordinator import (
     CarloGavazziModbusRuntimeData,
     CarloGavazziModbusSettingsCoordinator,
     create_readings_coordinator,
+    wrong_meter_issue_id,
 )
 from .entity import meter_device_info
 from .helpers import async_setup_meter, create_modbus_params
@@ -92,6 +94,12 @@ async def async_setup_entry(
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Unloading, such as to reconfigure, ends the check that raised it; setting
+    # up again reads the serial number first.
+    entry.async_on_unload(
+        lambda: ir.async_delete_issue(hass, DOMAIN, wrong_meter_issue_id(entry))
+    )
 
 
 async def async_unload_entry(

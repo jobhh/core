@@ -1,5 +1,6 @@
 """Config flow to configure the Carlo Gavazzi Modbus integration."""
 
+import asyncio
 from collections.abc import Mapping
 from typing import Any, override
 
@@ -42,6 +43,7 @@ from .const import (
     DEFAULT_UNIT_ID,
     DETECT_TIMEOUT,
     DOMAIN,
+    SEARCH_TIMEOUT,
     TYPE_GATEWAY,
     TYPE_SERIAL,
 )
@@ -145,30 +147,38 @@ def _sectioned(data: Mapping[str, Any]) -> dict[str, Any]:
     return sectioned
 
 
+async def _async_answers(
+    hass: HomeAssistant, params: ModbusSerialParams, unit_id: int, timeout: float
+) -> bool:
+    """Return whether a device answers a read of the model code.
+
+    A device that answers with a code no supported meter has still answered;
+    the step after reports what it is. A port that another entry polls only
+    opens at that entry's rate, which is the bus's rate; any other is refused.
+    """
+    try:
+        async with async_get_temporary_unit(hass, params, unit_id) as unit:
+            unit.require_timeout(timeout)
+            await async_identify(unit)
+    except UnsupportedMeterError:
+        return True
+    except HomeAssistantError, ModbusError:
+        return False
+    return True
+
+
 async def _async_detect_baudrate(
     hass: HomeAssistant, device: str, unit_id: int
 ) -> int | None:
     """Return the listed baud rate a device answers at on a port, if any.
 
     The meter keeps its baud rate in a register, which can only be read at
-    that rate, so each rate the meters offer is tried with a read of the model
-    code. A device that answers with a code no supported meter has still
-    answered at the right rate; the next step reports what it is.
-
-    A port that another entry already polls only opens at that entry's rate,
-    which is the bus's rate; the others are refused straight away.
+    that rate, so each rate the meters offer is tried.
     """
     for rate in BAUDRATES:
         params = ModbusSerialParams(device=device, baudrate=rate)
-        try:
-            async with async_get_temporary_unit(hass, params, unit_id) as unit:
-                unit.require_timeout(DETECT_TIMEOUT)
-                await async_identify(unit)
-        except UnsupportedMeterError:
+        if await _async_answers(hass, params, unit_id, DETECT_TIMEOUT):
             return rate
-        except HomeAssistantError, ModbusError:
-            continue
-        return rate
     return None
 
 
@@ -206,6 +216,9 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
     _port: dict[str, Any]
     _detected: int | None
 
+    # Searching every address at every rate, for a meter whose address changed.
+    _search: asyncio.Task[tuple[int, int] | None] | None = None
+
     @override
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -231,8 +244,80 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
             user_input[SECTION_MORE_OPTIONS][CONF_UNIT_ID],
         )
         if self._detected is None:
-            return await self.async_step_serial_baudrate_unknown()
+            return await self.async_step_serial_not_found()
         return await self.async_step_serial_baudrate()
+
+    async def async_step_serial_not_found(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Offer to search every address, or to enter the baud rate."""
+        return self.async_show_menu(
+            step_id="serial_not_found",
+            menu_options=["serial_search", "serial_baudrate_unknown"],
+            description_placeholders={
+                "unit_id": str(self._port[SECTION_MORE_OPTIONS][CONF_UNIT_ID])
+            },
+        )
+
+    async def async_step_serial_search(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Search every address at every rate, showing how far it got."""
+        if self._search is None:
+            # Not started eagerly: a port refused at every rate finishes the
+            # search at once, and the progress has to be shown first.
+            self._search = self.hass.async_create_task(
+                self._async_search(), eager_start=False
+            )
+        if not self._search.done():
+            return self.async_show_progress(
+                step_id="serial_search",
+                progress_action="search",
+                progress_task=self._search,
+            )
+
+        found = self._search.result()
+        self._search = None
+        if found is None:
+            return self.async_show_progress_done(next_step_id="serial_search_failed")
+        self._detected, unit_id = found
+        self._port = {**self._port, SECTION_MORE_OPTIONS: {CONF_UNIT_ID: unit_id}}
+        return self.async_show_progress_done(next_step_id="serial_baudrate")
+
+    async def async_step_serial_search_failed(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Give up: nothing answered at any address or rate."""
+        return self.async_abort(reason="no_meter_found")
+
+    async def _async_search(self) -> tuple[int, int] | None:
+        """Return the first rate and address a device answers at.
+
+        The address already tried at every rate is left out. Each rate's link
+        is held open across the addresses, at the search's short timeout, so
+        trying one is a single request rather than a new connection.
+        """
+        device = self._port[CONF_DEVICE]
+        tried = self._port[SECTION_MORE_OPTIONS][CONF_UNIT_ID]
+        addresses = [unit_id for unit_id in range(1, 248) if unit_id != tried]
+        total = len(BAUDRATES) * len(addresses)
+        done = 0
+        for rate in BAUDRATES:
+            params = ModbusSerialParams(device=device, baudrate=rate)
+            try:
+                async with async_get_temporary_unit(self.hass, params, tried) as hold:
+                    hold.require_timeout(SEARCH_TIMEOUT)
+                    for unit_id in addresses:
+                        if await _async_answers(
+                            self.hass, params, unit_id, SEARCH_TIMEOUT
+                        ):
+                            return rate, unit_id
+                        done += 1
+                        self.async_update_progress(done / total)
+            except HomeAssistantError:
+                # In use at another rate, which is the bus's.
+                done += len(addresses)
+        return None
 
     async def async_step_serial_baudrate(
         self, user_input: dict[str, Any] | None = None

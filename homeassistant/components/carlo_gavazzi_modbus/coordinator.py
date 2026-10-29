@@ -18,12 +18,18 @@ from modbus_connection import ModbusError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DOMAIN, LOGGER, SCAN_INTERVAL, SETTINGS_SCAN_INTERVAL
 
 type CarloGavazziModbusConfigEntry = ConfigEntry[CarloGavazziModbusRuntimeData]
+
+
+def wrong_meter_issue_id(entry: ConfigEntry) -> str:
+    """Return the repair issue raised while another meter answers for an entry."""
+    return f"wrong_meter_{entry.entry_id}"
 
 
 def _merge(first: UpdateReport, retry: UpdateReport) -> UpdateReport:
@@ -163,14 +169,26 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
         """Read the serial number, and stop if another meter answers.
 
         Stays due until it passes, so a wrong meter keeps the entities
-        unavailable for as long as it is there.
+        unavailable for as long as it is there. A repair issue says so where
+        it is seen, rather than only in the log.
         """
         await self.meter.identity.async_update()
+        issue_id = wrong_meter_issue_id(self.config_entry)
         if self.meter.serial_number != self.config_entry.unique_id:
+            ir.async_create_issue(
+                self.hass,
+                DOMAIN,
+                issue_id,
+                is_fixable=False,
+                severity=ir.IssueSeverity.ERROR,
+                translation_key="wrong_meter",
+                translation_placeholders={"title": self.config_entry.title},
+            )
             raise ConfigEntryError(
                 translation_domain=DOMAIN,
                 translation_key="wrong_meter",
             )
+        ir.async_delete_issue(self.hass, DOMAIN, issue_id)
         self._check_identity = False
 
     async def _async_retry(
