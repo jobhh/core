@@ -18,6 +18,11 @@ DEFAULT_BAUDRATE: Final = 9600
 
 # The rates both series offer on their RS485 port.
 BAUDRATES: Final = (9600, 19200, 38400, 57600, 115200)
+
+# How long to wait for the meter at each rate while looking for its baud rate.
+# The model code is one register, which answers in milliseconds even at
+# 9600 baud, so every rate the meter is not at costs this long.
+DETECT_TIMEOUT: Final = 1.0
 DEFAULT_UNIT_ID: Final = 1
 
 # The usual Modbus TCP port, which gateways also use in transparent mode.

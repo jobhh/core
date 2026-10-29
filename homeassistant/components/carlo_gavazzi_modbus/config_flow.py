@@ -3,8 +3,12 @@
 from collections.abc import Mapping
 from typing import Any, override
 
-from carlo_gavazzi_energy_meter_modbus import Meter, UnsupportedMeterError
-from modbus_connection import ModbusError
+from carlo_gavazzi_energy_meter_modbus import (
+    Meter,
+    UnsupportedMeterError,
+    async_identify,
+)
+from modbus_connection import ModbusError, ModbusSerialParams
 import probatio
 
 from homeassistant.components.modbus import async_get_temporary_unit
@@ -15,6 +19,7 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
 )
 from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
+from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
@@ -35,6 +40,7 @@ from .const import (
     DEFAULT_BAUDRATE,
     DEFAULT_PORT,
     DEFAULT_UNIT_ID,
+    DETECT_TIMEOUT,
     DOMAIN,
     TYPE_GATEWAY,
     TYPE_SERIAL,
@@ -64,22 +70,33 @@ MORE_OPTIONS = {
     )
 }
 
+# The rates the meters offer, with room to type another for a bus that runs
+# at one of its own.
+BAUDRATE_FIELD = {
+    probatio.Required(CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)): probatio.All(
+        SelectSelector(
+            SelectSelectorConfig(
+                options=[str(rate) for rate in BAUDRATES],
+                mode=SelectSelectorMode.DROPDOWN,
+                custom_value=True,
+            )
+        ),
+        probatio.Coerce(int),
+        probatio.Range(min=1200),
+    ),
+}
+
+# Setting up asks for the port first, then for the baud rate, filled in with
+# the one the meter answers at.
+STEP_SERIAL_PORT = probatio.Schema(
+    {probatio.Required(CONF_DEVICE): SerialPortSelector(), **MORE_OPTIONS}
+)
+STEP_SERIAL_BAUDRATE = probatio.Schema(BAUDRATE_FIELD)
+
 STEP_SERIAL = probatio.Schema(
     {
         probatio.Required(CONF_DEVICE): SerialPortSelector(),
-        # The rates the meters offer, with room to type another for a bus
-        # that runs at one of its own.
-        probatio.Required(CONF_BAUDRATE, default=str(DEFAULT_BAUDRATE)): probatio.All(
-            SelectSelector(
-                SelectSelectorConfig(
-                    options=[str(rate) for rate in BAUDRATES],
-                    mode=SelectSelectorMode.DROPDOWN,
-                    custom_value=True,
-                )
-            ),
-            probatio.Coerce(int),
-            probatio.Range(min=1200),
-        ),
+        **BAUDRATE_FIELD,
         **MORE_OPTIONS,
     }
 )
@@ -128,6 +145,33 @@ def _sectioned(data: Mapping[str, Any]) -> dict[str, Any]:
     return sectioned
 
 
+async def _async_detect_baudrate(
+    hass: HomeAssistant, device: str, unit_id: int
+) -> int | None:
+    """Return the listed baud rate a device answers at on a port, if any.
+
+    The meter keeps its baud rate in a register, which can only be read at
+    that rate, so each rate the meters offer is tried with a read of the model
+    code. A device that answers with a code no supported meter has still
+    answered at the right rate; the next step reports what it is.
+
+    A port that another entry already polls only opens at that entry's rate,
+    which is the bus's rate; the others are refused straight away.
+    """
+    for rate in BAUDRATES:
+        params = ModbusSerialParams(device=device, baudrate=rate)
+        try:
+            async with async_get_temporary_unit(hass, params, unit_id) as unit:
+                unit.require_timeout(DETECT_TIMEOUT)
+                await async_identify(unit)
+        except UnsupportedMeterError:
+            return rate
+        except HomeAssistantError, ModbusError:
+            continue
+        return rate
+    return None
+
+
 def _needs_relink(entry: ConfigEntry, data: Mapping[str, Any]) -> bool:
     """Whether probing these settings clashes with the connection in use.
 
@@ -157,6 +201,11 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
     # answers but is not a supported meter.
     _placeholders: dict[str, str]
 
+    # The serial port picked in the first step, and the baud rate the meter
+    # answered at there.
+    _port: dict[str, Any]
+    _detected: int | None
+
     @override
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -169,20 +218,64 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_serial(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle a meter on a serial port or an ESPHome serial proxy."""
-        return await self._async_step_link(TYPE_SERIAL, user_input)
+        """Ask which serial port the meter is on, then look for its baud rate."""
+        if user_input is None:
+            return self.async_show_form(
+                step_id=TYPE_SERIAL, data_schema=STEP_SERIAL_PORT
+            )
+
+        self._port = user_input
+        self._detected = await _async_detect_baudrate(
+            self.hass,
+            user_input[CONF_DEVICE],
+            user_input[SECTION_MORE_OPTIONS][CONF_UNIT_ID],
+        )
+        return await self.async_step_serial_baudrate()
+
+    async def async_step_serial_baudrate(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for the baud rate, filled in with the one the meter answered at."""
+        if user_input is not None:
+            return await self._async_step_link(
+                TYPE_SERIAL,
+                "serial_baudrate",
+                STEP_SERIAL_BAUDRATE,
+                {**self._port, **user_input},
+            )
+
+        errors = {}
+        if self._detected is None:
+            errors["base"] = "baudrate_not_detected"
+        return await self._async_step_link(
+            TYPE_SERIAL,
+            "serial_baudrate",
+            STEP_SERIAL_BAUDRATE,
+            None,
+            suggested_values={CONF_BAUDRATE: str(self._detected or DEFAULT_BAUDRATE)},
+            errors=errors,
+        )
 
     async def async_step_gateway(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle a meter behind an RS485-to-TCP gateway in transparent mode."""
-        return await self._async_step_link(TYPE_GATEWAY, user_input)
+        return await self._async_step_link(
+            TYPE_GATEWAY, TYPE_GATEWAY, STEP_GATEWAY, user_input
+        )
 
     async def _async_step_link(
-        self, connection_type: str, user_input: dict[str, Any] | None
+        self,
+        connection_type: str,
+        step_id: str,
+        schema: probatio.Schema,
+        user_input: dict[str, Any] | None,
+        *,
+        suggested_values: Mapping[str, Any] | None = None,
+        errors: dict[str, str] | None = None,
     ) -> ConfigFlowResult:
         """Ask for the link settings, then probe the meter behind them."""
-        errors: dict[str, str] = {}
+        errors = errors or {}
         self._placeholders = {}
 
         if user_input is not None:
@@ -192,12 +285,11 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(meter.serial_number)
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(title=meter_name(meter), data=data)
+            suggested_values = user_input
 
         return self.async_show_form(
-            step_id=connection_type,
-            data_schema=self.add_suggested_values_to_schema(
-                SCHEMAS[connection_type], user_input
-            ),
+            step_id=step_id,
+            data_schema=self.add_suggested_values_to_schema(schema, suggested_values),
             errors=errors,
             description_placeholders=self._placeholders,
         )

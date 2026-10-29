@@ -19,6 +19,7 @@ from homeassistant.components.carlo_gavazzi_modbus.const import (
     CONF_UNIT_ID,
     DOMAIN,
     TYPE_GATEWAY,
+    TYPE_SERIAL,
 )
 from homeassistant.config_entries import SOURCE_USER, ConfigEntryState, ConfigFlowResult
 from homeassistant.const import CONF_DEVICE, CONF_HOST, CONF_PORT, CONF_TYPE
@@ -36,11 +37,12 @@ from .conftest import (
     async_seed_unit,
 )
 
-USER_INPUT = {
+# Setting up on a serial port asks for the port, then for the baud rate.
+PORT_INPUT = {
     CONF_DEVICE: DEVICE,
-    CONF_BAUDRATE: str(BAUDRATE),
     SECTION_MORE_OPTIONS: {CONF_UNIT_ID: UNIT_ID},
 }
+USER_INPUT = {CONF_BAUDRATE: str(BAUDRATE)}
 
 GATEWAY_INPUT = {
     CONF_HOST: "Gateway.local",
@@ -56,14 +58,42 @@ GATEWAY_DATA = {
 
 
 async def _start_flow(hass: HomeAssistant, link: str = "serial") -> ConfigFlowResult:
-    """Start a user flow and pick how the meter is reached."""
+    """Start a user flow and pick how the meter is reached.
+
+    On a serial port, this also picks the port, landing on the baud rate.
+    """
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
     assert result["type"] is FlowResultType.MENU
-    return await hass.config_entries.flow.async_configure(
+    result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {"next_step_id": link}
     )
+    if link != TYPE_SERIAL:
+        return result
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == TYPE_SERIAL
+    return await hass.config_entries.flow.async_configure(result["flow_id"], PORT_INPUT)
+
+
+def _suggested_baudrate(result: ConfigFlowResult) -> str:
+    """Return the baud rate a form fills in."""
+    key = next(key for key in result["data_schema"].schema if key == CONF_BAUDRATE)
+    return key.description["suggested_value"]
+
+
+def _answering_at(connection: MockModbusConnection, rate: int) -> Any:
+    """Return temporary units that only answer at one baud rate."""
+
+    @asynccontextmanager
+    async def temporary_unit(
+        hass: HomeAssistant, params: Any, unit_id: int
+    ) -> AsyncIterator[MockModbusUnit]:
+        if params.baudrate != rate:
+            raise ModbusTimeoutError
+        yield connection.for_unit(unit_id)
+
+    return temporary_unit
 
 
 # A model code no Carlo Gavazzi meter this integration supports reports.
@@ -75,7 +105,8 @@ async def test_user_flow(hass: HomeAssistant) -> None:
     """Test setting up a meter on a serial port."""
     result = await _start_flow(hass)
     assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "serial"
+    assert result["step_id"] == "serial_baudrate"
+    assert result["errors"] == {}
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], USER_INPUT
@@ -108,6 +139,61 @@ async def test_user_flow_invalid_baudrate(hass: HomeAssistant, baudrate: str) ->
         await hass.config_entries.flow.async_configure(
             result["flow_id"], {**USER_INPUT, CONF_BAUDRATE: baudrate}
         )
+
+
+@pytest.mark.usefixtures("mock_setup_entry")
+async def test_user_flow_detects_the_baudrate(
+    hass: HomeAssistant, mock_modbus_connection: MockModbusConnection
+) -> None:
+    """Test the baud rate the meter answers at is filled in."""
+    with patch(
+        "homeassistant.components.carlo_gavazzi_modbus.config_flow.async_get_temporary_unit",
+        _answering_at(mock_modbus_connection, 57600),
+    ):
+        result = await _start_flow(hass)
+
+    assert result["step_id"] == "serial_baudrate"
+    assert result["errors"] == {}
+    assert _suggested_baudrate(result) == "57600"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_BAUDRATE: "57600"}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == SERIAL_NUMBER
+    assert result["data"][CONF_BAUDRATE] == 57600
+
+
+@pytest.mark.usefixtures("mock_setup_entry")
+async def test_user_flow_baudrate_not_detected(
+    hass: HomeAssistant, mock_modbus_connection: MockModbusConnection
+) -> None:
+    """Test a port where nothing answers says so, and still takes a rate."""
+    temporary_unit = _answering_at(mock_modbus_connection, 0)
+    with patch(
+        "homeassistant.components.carlo_gavazzi_modbus.config_flow.async_get_temporary_unit",
+        side_effect=temporary_unit,
+    ) as tried:
+        result = await _start_flow(hass)
+
+    assert result["step_id"] == "serial_baudrate"
+    assert result["errors"] == {"base": "baudrate_not_detected"}
+    assert _suggested_baudrate(result) == "9600"
+    # One attempt at each rate the meters offer.
+    assert [call.args[1].baudrate for call in tried.call_args_list] == [
+        9600,
+        19200,
+        38400,
+        57600,
+        115200,
+    ]
+
+    # The meter answers once its own rate is picked.
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], USER_INPUT
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == SERIAL_NUMBER
 
 
 def _no_answer(unit: MockModbusUnit) -> None:
