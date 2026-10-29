@@ -134,10 +134,10 @@
   },
   "exceptions": {
     "communication_error": {
-      "message": "Could not communicate with the meter: {error}"
+      "message": "Could not communicate with the meter."
     },
     "link_settings_in_use": {
-      "message": "The serial port is already in use at other settings: {error}"
+      "message": "The serial port is already in use by another entry at other settings, such as another baud rate."
     },
     "unsupported_meter": {
       "message": "[%key:component::carlo_gavazzi_modbus::config::error::unsupported_meter%]"

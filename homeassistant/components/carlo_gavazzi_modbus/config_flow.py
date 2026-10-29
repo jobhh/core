@@ -107,8 +107,7 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
                 meter = EM500Meter(unit)
                 await meter.async_ensure_setup()
         except HomeAssistantError, ModbusError:
-            # HomeAssistantError: the port is already in use at other line
-            # settings, which one connection cannot honour.
+            # HomeAssistantError: the port is in use at other line settings.
             return {"base": "cannot_connect"}, None
         except UnsupportedMeterError:
             return {"base": "unsupported_meter"}, None

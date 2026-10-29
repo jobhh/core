@@ -45,12 +45,9 @@ async def async_setup_entry(
             hass, entry, create_modbus_params(entry.data), entry.data[CONF_UNIT_ID]
         )
     except HomeAssistantError as err:
-        # The port is already in use at other line settings, which one shared
-        # connection cannot honour.
         raise ConfigEntryError(
             translation_domain=DOMAIN,
             translation_key="link_settings_in_use",
-            translation_placeholders={"error": str(err)},
         ) from err
 
     meter = EM500Meter(unit)
@@ -60,7 +57,6 @@ async def async_setup_entry(
         raise ConfigEntryNotReady(
             translation_domain=DOMAIN,
             translation_key="communication_error",
-            translation_placeholders={"error": str(err) or type(err).__name__},
         ) from err
     except UnsupportedMeterError as err:
         raise ConfigEntryError(
@@ -68,8 +64,8 @@ async def async_setup_entry(
             translation_key="unsupported_meter",
         ) from err
 
-    # The address can come to point at another meter, such as after rewiring
-    # the bus; every identity here derives from the serial number.
+    # Every identity derives from the serial number, and an address can come
+    # to point at another meter.
     if meter.serial_number != serial_number:
         raise ConfigEntryError(
             translation_domain=DOMAIN,

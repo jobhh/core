@@ -1,13 +1,16 @@
 """Tests for setting up the Carlo Gavazzi Modbus integration."""
 
+import logging
 from unittest.mock import patch
 
-from modbus_connection import ModbusTimeoutError
+from freezegun.api import FrozenDateTimeFactory
+from modbus_connection import ModbusConnectionError, ModbusTimeoutError
 from modbus_connection.mock import MockModbusUnit
-from pytest_homeassistant.common import MockConfigEntry
+import pytest
+from pytest_homeassistant.common import MockConfigEntry, async_fire_time_changed
 from syrupy.assertion import SnapshotAssertion
 
-from homeassistant.components.carlo_gavazzi_modbus.const import DOMAIN
+from homeassistant.components.carlo_gavazzi_modbus.const import DOMAIN, SCAN_INTERVAL
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
@@ -17,6 +20,11 @@ from .conftest import ENTRY_DATA, SERIAL_NUMBER, async_seed_unit
 
 # An EM340, which speaks another register map.
 EM340_MODEL_CODE = 341
+
+# The library names the port in its errors, and an ESPHome serial proxy's port
+# carries the device's encryption key.
+PORT_KEY = "c2VjcmV0LWtleQ=="
+LEAKING_ERROR = f"could not open serial port esphome://proxy/?noise_psk={PORT_KEY}"
 
 
 async def test_setup_and_unload(
@@ -47,6 +55,44 @@ async def test_meter_not_answering_retries(
     await hass.config_entries.async_setup(mock_config_entry.entry_id)
 
     assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
+
+
+async def test_port_key_stays_out_of_setup_errors(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_modbus_unit: MockModbusUnit,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test an ESPHome encryption key in the port is neither shown nor logged.
+
+    Debug logging still shows the error's cause, which is up to the library.
+    """
+    caplog.set_level(logging.INFO)
+    mock_modbus_unit.fail_requests(ModbusConnectionError(LEAKING_ERROR))
+    mock_config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(mock_config_entry.entry_id)
+
+    assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
+    assert PORT_KEY not in str(mock_config_entry.reason)
+    assert PORT_KEY not in caplog.text
+
+
+async def test_port_key_stays_out_of_poll_errors(
+    hass: HomeAssistant,
+    init_integration: MockConfigEntry,
+    mock_modbus_unit: MockModbusUnit,
+    freezer: FrozenDateTimeFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test an ESPHome encryption key in the port is not logged while polling."""
+    caplog.set_level(logging.INFO)
+    mock_modbus_unit.fail_requests(ModbusConnectionError(LEAKING_ERROR))
+    freezer.tick(SCAN_INTERVAL)
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+
+    assert "Could not communicate with the meter" in caplog.text
+    assert PORT_KEY not in caplog.text
 
 
 async def test_unsupported_meter_fails_setup(

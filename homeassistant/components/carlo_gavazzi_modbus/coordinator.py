@@ -66,12 +66,10 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
             raise UpdateFailed(
                 translation_domain=DOMAIN,
                 translation_key="communication_error",
-                translation_placeholders={"error": str(err) or type(err).__name__},
             ) from err
 
-        # A sub-system that just fell silent is asked once more, so one lost
-        # frame on the RS485 bus does not blank its entities. One that stays
-        # silent is not, or it would double every poll from here on.
+        # Retry only what just fell silent, so a lost frame does not blank
+        # entities and a block that stays silent does not double every poll.
         if retry := report.failed.keys() - self._silent:
             report = await self._async_retry(report, retry)
 
@@ -81,15 +79,15 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
     async def _async_retry(
         self, report: UpdateReport, names: Iterable[str]
     ) -> UpdateReport:
-        """Poll the named sub-systems again, keeping the report if that dies.
-
-        Values read a moment ago are not stale because the link dropped right
-        after; the next poll reports the dead link.
-        """
+        """Poll the named sub-systems again, keeping the report if that dies."""
         try:
             retried = await self.meter.async_poll(names)
         except ModbusError as err:
-            LOGGER.debug("%s: the retry failed (%s); keeping the poll", self.name, err)
+            LOGGER.debug(
+                "%s: the retry failed (%s); keeping the poll",
+                self.name,
+                type(err).__name__,
+            )
             return report
         return _merge(report, retried)
 
@@ -98,11 +96,13 @@ class CarloGavazziModbusDataUpdateCoordinator(DataUpdateCoordinator[UpdateReport
         for subsystem, error in report.failed.items():
             if subsystem not in self._silent:
                 self._silent.add(subsystem)
+                # The error's text can name the port, which may carry an
+                # ESPHome encryption key.
                 LOGGER.warning(
                     "%s: %s did not answer this poll: %s",
                     self.name,
                     subsystem,
-                    str(error) or type(error).__name__,
+                    type(error).__name__,
                 )
 
         for subsystem in report.updated & self._silent:
