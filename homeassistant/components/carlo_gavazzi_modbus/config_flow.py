@@ -230,30 +230,49 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
             user_input[CONF_DEVICE],
             user_input[SECTION_MORE_OPTIONS][CONF_UNIT_ID],
         )
+        if self._detected is None:
+            return await self.async_step_serial_baudrate_unknown()
         return await self.async_step_serial_baudrate()
 
     async def async_step_serial_baudrate(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Ask for the baud rate, filled in with the one the meter answered at."""
+        return await self._async_step_baudrate("serial_baudrate", user_input)
+
+    async def async_step_serial_baudrate_unknown(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for the baud rate when the meter answered at none of them."""
+        return await self._async_step_baudrate("serial_baudrate_unknown", user_input)
+
+    async def _async_step_baudrate(
+        self, step_id: str, user_input: dict[str, Any] | None
+    ) -> ConfigFlowResult:
+        """Ask for the baud rate, saying how the one filled in was found.
+
+        The form names the address rather than the port: an ESPHome serial
+        proxy's port carries its encryption key.
+        """
+        placeholders = {
+            "baudrate": str(self._detected or DEFAULT_BAUDRATE),
+            "unit_id": str(self._port[SECTION_MORE_OPTIONS][CONF_UNIT_ID]),
+        }
         if user_input is not None:
             return await self._async_step_link(
                 TYPE_SERIAL,
-                "serial_baudrate",
+                step_id,
                 STEP_SERIAL_BAUDRATE,
                 {**self._port, **user_input},
+                placeholders=placeholders,
             )
-
-        errors = {}
-        if self._detected is None:
-            errors["base"] = "baudrate_not_detected"
         return await self._async_step_link(
             TYPE_SERIAL,
-            "serial_baudrate",
+            step_id,
             STEP_SERIAL_BAUDRATE,
             None,
-            suggested_values={CONF_BAUDRATE: str(self._detected or DEFAULT_BAUDRATE)},
-            errors=errors,
+            suggested_values={CONF_BAUDRATE: placeholders["baudrate"]},
+            placeholders=placeholders,
         )
 
     async def async_step_gateway(
@@ -272,11 +291,11 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None,
         *,
         suggested_values: Mapping[str, Any] | None = None,
-        errors: dict[str, str] | None = None,
+        placeholders: Mapping[str, str] | None = None,
     ) -> ConfigFlowResult:
         """Ask for the link settings, then probe the meter behind them."""
-        errors = errors or {}
-        self._placeholders = {}
+        errors: dict[str, str] = {}
+        self._placeholders = dict(placeholders or {})
 
         if user_input is not None:
             data = _flatten(connection_type, user_input)
@@ -354,7 +373,7 @@ class CarloGavazziModbusFlowHandler(ConfigFlow, domain=DOMAIN):
             # settings, which one connection cannot honour.
             return {"base": "cannot_connect"}, None
         except UnsupportedMeterError as err:
-            self._placeholders = {"code": str(err.code)}
+            self._placeholders["code"] = str(err.code)
             return {"base": "unsupported_meter"}, None
 
         if not meter.serial_number:

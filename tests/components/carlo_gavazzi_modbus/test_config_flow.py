@@ -155,6 +155,10 @@ async def test_user_flow_detects_the_baudrate(
     assert result["step_id"] == "serial_baudrate"
     assert result["errors"] == {}
     assert _suggested_baudrate(result) == "57600"
+    assert result["description_placeholders"] == {
+        "baudrate": "57600",
+        "unit_id": str(UNIT_ID),
+    }
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_BAUDRATE: "57600"}
@@ -176,8 +180,12 @@ async def test_user_flow_baudrate_not_detected(
     ) as tried:
         result = await _start_flow(hass)
 
-    assert result["step_id"] == "serial_baudrate"
-    assert result["errors"] == {"base": "baudrate_not_detected"}
+    assert result["step_id"] == "serial_baudrate_unknown"
+    assert result["errors"] == {}
+    assert result["description_placeholders"] == {
+        "baudrate": "9600",
+        "unit_id": str(UNIT_ID),
+    }
     assert _suggested_baudrate(result) == "9600"
     # One attempt at each rate the meters offer.
     assert [call.args[1].baudrate for call in tried.call_args_list] == [
@@ -247,7 +255,12 @@ async def test_user_flow_errors(
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": error}
-    assert result["description_placeholders"] == placeholders
+    # Next to what the baud rate step always names.
+    assert result["description_placeholders"] == {
+        "baudrate": "9600",
+        "unit_id": str(UNIT_ID),
+        **placeholders,
+    }
 
     mock_modbus_unit.fail_requests(None)
     mock_modbus_unit.input.update(snapshot[0])

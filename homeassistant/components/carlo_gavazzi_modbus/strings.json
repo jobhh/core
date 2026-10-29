@@ -5,7 +5,6 @@
       "wrong_meter": "[%key:component::carlo_gavazzi_modbus::exceptions::wrong_meter::message%]"
     },
     "error": {
-      "baudrate_not_detected": "No device answered on that port at any of the listed baud rates, at the Modbus address you entered. Check the address and the wiring, or pick the meter's baud rate yourself.",
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "no_serial_number": "The meter did not report a serial number, which is needed to identify it.",
       "unsupported_meter": "A device answers there, but its model code {code} is not one of the supported meters: the EM530, EM540, EM330, EM340, ET330 and ET340."
@@ -86,8 +85,18 @@
         "data_description": {
           "baudrate": "The baud rate set on the meter, under rS485. The factory default is 9600. Type another rate if your bus runs at one the meters do not list."
         },
-        "description": "Home Assistant tried each baud rate the meters offer, and filled in the one the meter answered at.",
-        "title": "Baud rate"
+        "description": "The meter at Modbus address {unit_id} answered at **{baudrate} baud**, so that rate is filled in below.\n\nA meter keeps its baud rate in its own settings, and those can only be read once Home Assistant talks to it at that rate. So it tried each rate the meters offer (9600, 19200, 38400, 57600 and 115200) until the meter answered. Change it only if you know the meter is set to another rate.",
+        "title": "Baud rate found"
+      },
+      "serial_baudrate_unknown": {
+        "data": {
+          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::serial_baudrate::data::baudrate%]"
+        },
+        "data_description": {
+          "baudrate": "[%key:component::carlo_gavazzi_modbus::config::step::serial_baudrate::data_description::baudrate%]"
+        },
+        "description": "No meter answered at Modbus address {unit_id} at any baud rate, so the factory default of {baudrate} baud is filled in below.\n\nA meter keeps its baud rate in its own settings, and those can only be read once Home Assistant talks to it at that rate. So it tried each rate the meters offer (9600, 19200, 38400, 57600 and 115200), and none got an answer. Check that the Modbus address matches the one set on the meter, and the wiring: swapping A and B is worth a try. Or pick the baud rate the meter shows in its setup menu, under rS485.",
+        "title": "Baud rate not found"
       },
       "user": {
         "menu_options": {
